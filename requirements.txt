@@ -1,4 +1,4 @@
 ## Blinky led_master python requirements
 feedparser
-bitly
+bitly_api
 pushbullet
