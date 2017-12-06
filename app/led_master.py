@@ -3,7 +3,8 @@ from time import strftime
 
 __author__ =        "Stranger Production, LLC"
 __created__ =       "23 January 2017"
-__version__ =       "0.0.3"
+__modified__ =      "05 December 2017"
+__version__ =       "0.1.0"
 __description___ =  '''MASTER LED CONTROL PROGRAM 
                     LED Board Project for Adafruit RGB-LED Hat 
                     with 2x 32x64px LED boards.'''
@@ -19,6 +20,7 @@ __changes__ =       ''' Version Changes
                           o Cleaned code
                     0.0.4 - Stop RSS feed
                           + Add Pushbullet feed
+                    0.1.0 + Dockerized Application
                     '''
                         
 from blinkybase import BlinkyBase
