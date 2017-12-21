@@ -301,7 +301,7 @@ if __name__ == "__main__":
         curr_tweet = Array('c', b'username: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', lock=lock) 
         
         #Start TWEET_QUERY LOOP
-        rt = Process(target=tweet_query)
+        rt = Process(target=tweet_query, name='tweet_query')
         jobs.append(rt)
         rt.start()
 
@@ -331,7 +331,7 @@ if __name__ == "__main__":
         # rt.start()
         
         #Start LED UPDATE LOOP
-        rt = Process(target=led_update)
+        rt = Process(target=led_update, name='led_update')
         jobs.append(rt)
         rt.start()
         
