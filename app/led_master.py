@@ -89,6 +89,13 @@ class RunText(BlinkyBase):
             graphics.DrawText(offscreenCanvas, count_label_font, 1, 25, count_label_color, 'NOT MY PRESIDENT!')
             self.temp = str('%sF') % curr_temp.value
             graphics.DrawText(offscreenCanvas, count_wx_font, 104, 25, count_wx_color, self.temp)
+            if curr_tweet.value != '': 
+                ticker = curr_tweet.value
+                len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
+                self.pos -= 1
+                if (self.pos + len < 0):
+                    self.pos = offscreenCanvas.width
+            
             #print(ticker_ready.value)
 #             if ticker_ready.value == 1: 
 #                 self.image = Image.open(news_ticker.value)
@@ -272,8 +279,9 @@ class tweet_query():
                 query = { '$query' : {}, '$orderby' : { '$natural' : -1 } }
                 projection = { '_id' : 0, 'user.screen_name' : 1, 'text' : 1 ,'created_at' : 1}
                 result = db.twitter_query.find_one(query, projection)
-                output = str(result['user']['screen_name'] + ': ' + result['text'] + ': ' + result['created_at']).encode('ascii','ignore')
-                print(output)
+                self.output = str(result['user']['screen_name'] + ': ' + result['text'] + ': ' + result['created_at']).encode('ascii','ignore')
+                print(self.output)
+                curr_tweet.value = self.output
             except:
                 time.sleep(10)
                 tweet_query()
@@ -298,7 +306,7 @@ if __name__ == "__main__":
         news_ticker = Array('c', b'9999.ppm' ,lock=lock)
         news_ticker.value = str('0.ppm')
         ticker_ready = Value('i', 0)
-        curr_tweet = Array('c', b'username: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', lock=lock) 
+        curr_tweet = Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
         
         #Start TWEET_QUERY LOOP
         rt = Process(target=tweet_query, name='tweet_query')
