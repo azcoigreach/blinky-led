@@ -26,6 +26,4 @@ class tweet_update():
             time.sleep(30)
 
 def tweet_query(d):
-    global d
     logger.debug(d)
-    
