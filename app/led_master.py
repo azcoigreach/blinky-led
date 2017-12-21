@@ -11,14 +11,13 @@ logger.setLevel(logging.DEBUG)
 if __name__ == "__main__":
     try:
         logger.warning('Work Started: PID %d', os.getpid())
-        manager = Manager()
-        d = manager.dict()
-        d = {'time_now': b'88/88/88 88:88', 'count_down': b'8888Days 88H 88M', 'curr_temp':888.8, 'news_ticker':b'0.ppm', 'curr_tweet':b'screen_name: xxxx : ddd mmm DD HH:MM:SS +0000 YYYY'}
-        logger.debug(d)
-        apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
-        processes = {}
-        n=0
-        while True:
+        while Manager() as manager:
+            d = manager.dict()
+            d = {'time_now': b'88/88/88 88:88', 'count_down': b'8888Days 88H 88M', 'curr_temp':888.8, 'news_ticker':b'0.ppm', 'curr_tweet':b'screen_name: xxxx : ddd mmm DD HH:MM:SS +0000 YYYY'}
+            logger.debug(d)
+            apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
+            processes = {}
+            n=0
             for app in apps:
                 instance = app(d)
                 p = Process(target=instance.start_listener, args=(d,))
