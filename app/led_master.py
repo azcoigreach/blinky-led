@@ -6,7 +6,7 @@ from workers import *
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('MASTER')
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
 
 if __name__ == "__main__":
     try:
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         while True:
             for app in apps:
                 instance = app(d)
-                logger.debug(instance)
+                logger.info(instance)
                 p = Process(target=instance.start_listener, args=(d,))
                 p.start()
                 processes[n] = (p, app)
