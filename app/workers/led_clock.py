@@ -3,7 +3,7 @@ from time import strftime
 import time
 import datetime
 import logging
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class led_clock():
