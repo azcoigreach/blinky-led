@@ -21,7 +21,7 @@ if __name__ == "__main__":
         while True:
             for app in apps:
                 instance = app(d)
-                logger.info(instance)
+                logger.info(pprint.pprint(instance))
                 p = Process(target=instance.start_listener, args=(d,))
                 p.start()
                 processes[n] = (p, app)
