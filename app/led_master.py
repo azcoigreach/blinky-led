@@ -43,6 +43,9 @@ from pushbullet import Listener
 from pymongo import MongoClient
 import pprint
 
+import glob
+__all__ = [os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__) + "/workers/*.py")]
+
 import workers.led_update
 import workers.tweet_query
 import workers.led_clock
@@ -50,7 +53,6 @@ import workers.countdown_clock
 import workers.rss_feed
 import workers.weather
 import workers.pb_query
-
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('led_master')
