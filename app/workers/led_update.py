@@ -2,6 +2,9 @@ from blinkybase import BlinkyBase
 from rgbmatrix import graphics
 from multiprocessing.sharedctypes import Value, Array
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
