@@ -77,7 +77,7 @@ class RunText(BlinkyBase):
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
 def led_update(d):
-    pprint.pprint(d[time_now])
+    pprint.pprint(d['time_now'])
     
     
     parser = RunText(d)
