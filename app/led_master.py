@@ -24,8 +24,7 @@ __changes__ =       ''' Version Changes
                     0.2.0 + added mongodb connection
                     '''
                         
-from blinkybase import BlinkyBase
-from rgbmatrix import graphics
+
 import time
 from multiprocessing import Process, Lock
 from multiprocessing.sharedctypes import Value, Array
@@ -76,11 +75,11 @@ if __name__ == "__main__":
         curr_tweet = Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
      
 
-        apps = ['workers.led_update','workers.tweet_query','workers.led_clock','workers.countdown_clock','workers.weather'] 
+        apps = [workers.led_update,workers.tweet_query,workers.led_clock,workers.countdown_clock,workers.weather] 
         processes = {}
         n=0
         for app in apps:
-            instance = app()
+            instance = app.
             p = Process(target=instance.start_listener)
             p.start()
             processes[n] = (p, app) # Keep the process and the app to monitor or restart
