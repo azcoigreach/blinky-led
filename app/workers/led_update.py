@@ -1,3 +1,4 @@
+import time
 from blinkybase import BlinkyBase
 from rgbmatrix import graphics
 from multiprocessing import Process, Manager
