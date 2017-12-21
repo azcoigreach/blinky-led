@@ -57,6 +57,7 @@ class RunText(BlinkyBase):
             
             # Top Twitter Ticker
             if d_curr_tweet != '': 
+                logger.debug(d_curr_tweet)
                 ticker = d_curr_tweet
                 len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
                 self.pos -= 1
