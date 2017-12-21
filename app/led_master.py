@@ -273,8 +273,9 @@ class tweet_query():
             sort = '{ "$natural": -1 }'
             limit = 1
             results = db.twitter_query.find(query, projection).sort(sort).limit(limit)
-            try
+            try:
                 pprint.pprint(results)
+                
             time.sleep(15)
 
 
