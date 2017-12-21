@@ -44,8 +44,8 @@ from pymongo import MongoClient
 import pprint
 
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('led_master')
-logger.setLevel(logging.INFO)
 
 
 class RunText(BlinkyBase):
