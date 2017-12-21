@@ -306,7 +306,7 @@ if __name__ == "__main__":
         
         jobs = []
         lock = Lock()
-        apps = ['led_update','tweet_query','led_clock','countdown_clock','weather']
+        
         
         #Process Variables
         time_now = Array('c', b'88/88/88 88:88' ,lock=lock) 
@@ -317,6 +317,7 @@ if __name__ == "__main__":
         ticker_ready = Value('i', 0)
         curr_tweet = Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
         
+        apps = ['led_update','tweet_query','led_clock','countdown_clock','weather']
         n=0
         for app in apps:
             instance = app()
