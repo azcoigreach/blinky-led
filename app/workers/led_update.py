@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-
+import pprint
 
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
@@ -77,8 +77,8 @@ class RunText(BlinkyBase):
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
 def led_update(d):
+    pprint.pprint(d)
     
-    
-    parser = RunText(self.d)
+    parser = RunText(d)
     if (not parser.process()):
         parser.print_help()
