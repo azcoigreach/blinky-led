@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 class rss_feed():
+    global d
     def __init__(self, *args, **kwargs):
         self.BITLY_ACCESS_TOKEN = "b6eeb2e971399411b0c5ee15db56b2c353e97e9d"
         self.items=[]

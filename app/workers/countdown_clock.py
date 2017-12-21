@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 class countdown_clock():
     def __init__(self, *args, **kwargs):
+        global d
         while True:
             dt = datetime.datetime
             count = dt(2021,1,21,9) - dt.now()

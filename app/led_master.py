@@ -8,6 +8,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('MASTER')
 
 if __name__ == "__main__":
+    global d
     try:
         logger.warning('Work Started: PID %d', os.getpid())
         
