@@ -329,7 +329,7 @@ if __name__ == "__main__":
         while len(processes) > 0:
             for n in processes.keys():
                 (p, a) = processes[n]
-                sleep(0.5)
+                time.sleep(0.5)
                 if p.exitcode is None and not p.is_alive(): # Not finished and not running
                     # Do your error handling and restarting here assigning the new process to processes[n]
                     logger.warning('is gone as if never born!',a)
