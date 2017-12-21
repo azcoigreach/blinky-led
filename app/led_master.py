@@ -126,8 +126,8 @@ class led_clock():
             dt = datetime.datetime
             t = dt.now()
             time_now.value = t.strftime('%m/%d/%y %H:%M')
-            #print(time_now.value)
-            time.sleep(0.1)
+            logger.debug('Current Time: %s',time_now.value)
+            time.sleep(2)
 
 
 class countdown_clock():
@@ -136,8 +136,8 @@ class countdown_clock():
             dt = datetime.datetime
             count = dt(2021,1,21,9) - dt.now()
             count_down.value = '%dDays %dH %dM' % (count.days, count.seconds/3600, count.seconds%3600/60)
-            #print(count_down.value)
-            time.sleep(0.1)
+            logger.debug('Count Clock: %s', count_down.value)
+            time.sleep(2)
     
 class weather():
     def __init__(self, *args, **kwargs):
@@ -306,7 +306,7 @@ if __name__ == "__main__":
         
         jobs = []
         lock = Lock()
-        
+        apps = ['led_update','tweet_query','led_clock','countdown_clock','weather']
         
         #Process Variables
         time_now = Array('c', b'88/88/88 88:88' ,lock=lock) 
@@ -317,45 +317,69 @@ if __name__ == "__main__":
         ticker_ready = Value('i', 0)
         curr_tweet = Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
         
-        #Start TWEET_QUERY LOOP
-        rt = Process(target=tweet_query, name='tweet_query')
-        jobs.append(rt)
-        rt.start()
+        n=0
+        for app in apps:
+            instance = app()
+            p = Process(target=instance.start_listener)
+            p.start()
+            processes[n] = (p, app) # Keep the process and the app to monitor or restart
+            n += 1
 
-        #Start LED_CLOCK LOOP
-        rt = Process(target=led_clock, name='led_clock')
-        jobs.append(rt)
-        rt.start()
-        
-        #Start COUNTDOWN_CLOCK LOOP
-        rt = Process(target=countdown_clock, name='countdown_clock')
-        jobs.append(rt)
-        rt.start()
-        
-        #Start WEATHER LOOP
-        rt = Process(target=weather, name='weather')
-        jobs.append(rt)
-        rt.start()
-        
-        #Start RSS Feed Updater
-        # rt = Process(target=rss_feed)
+        while len(processes) > 0:
+            for n in processes.keys():
+                (p, a) = processes[n]
+                sleep(0.5)
+                if p.exitcode is None and not p.is_alive(): # Not finished and not running
+                    # Do your error handling and restarting here assigning the new process to processes[n]
+                    logger.warning('is gone as if never born!',a)
+                elif p.exitcode < 0:
+                    logger.warning('Process Ended with an error or a terminate', a)
+                    # Handle this either by restarting or delete the entry so it is removed from list as for else
+                else:
+                    logger.warning('finished',a)
+                    p.join() # Allow tidyup
+                    del processes[n] # Removed finished items from the dictionary 
+                    # When none are left then loop will end
+    logger.warning('FINISHED')
+        # #Start TWEET_QUERY LOOP
+        # rt = Process(target=tweet_query, name='tweet_query')
+        # jobs.append(rt)
+        # rt.start()
+
+        # #Start LED_CLOCK LOOP
+        # rt = Process(target=led_clock, name='led_clock')
         # jobs.append(rt)
         # rt.start()
         
-        #Start Pushbullet Listener
-        # rt = Process(target=pb_main)
+        # #Start COUNTDOWN_CLOCK LOOP
+        # rt = Process(target=countdown_clock, name='countdown_clock')
         # jobs.append(rt)
         # rt.start()
         
-        #Start LED UPDATE LOOP
-        rt = Process(target=led_update, name='led_update')
-        jobs.append(rt)
-        rt.start()
+        # #Start WEATHER LOOP
+        # rt = Process(target=weather, name='weather')
+        # jobs.append(rt)
+        # rt.start()
         
-        #JOIN ALL JOBS
-        for j in jobs:
-            j.join()
-            logger.info(j)
+        # #Start RSS Feed Updater
+        # # rt = Process(target=rss_feed)
+        # # jobs.append(rt)
+        # # rt.start()
+        
+        # #Start Pushbullet Listener
+        # # rt = Process(target=pb_main)
+        # # jobs.append(rt)
+        # # rt.start()
+        
+        # #Start LED UPDATE LOOP
+        # rt = Process(target=led_update, name='led_update')
+        # jobs.append(rt)
+        # rt.start()
+        
+        # #JOIN ALL JOBS
+        # for j in jobs:
+        #     j.join()
+        #     logger.info(j)
             
     except KeyboardInterrupt:
         for j in jobs:
