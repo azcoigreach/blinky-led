@@ -28,7 +28,7 @@ if __name__ == "__main__":
         logger.warning('Work Started: PID %d', os.getpid())
         
         jobs = []
-        lock = Lock()
+        # lock = Lock()
         manager = Manager()
          
         #Process Variables
