@@ -1,3 +1,8 @@
+
+from multiprocessing.sharedctypes import Value, Array
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 class weather():
     def __init__(self, *args, **kwargs):
         while True:

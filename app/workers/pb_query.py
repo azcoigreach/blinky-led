@@ -1,3 +1,11 @@
+
+from multiprocessing.sharedctypes import Value, Array
+from pushbullet import Pushbullet
+from pushbullet import Listener
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 class pb_query():
     def __init__(self, *args, **kwargs):
         logger.warning('PB Started...')

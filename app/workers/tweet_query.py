@@ -1,3 +1,12 @@
+
+from multiprocessing.sharedctypes import Value, Array
+from pymongo import MongoClient
+import pprint
+
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 class tweet_query():
     def __init__(self, *args, **kwargs):
         client = MongoClient('192.168.1.240', 27017)

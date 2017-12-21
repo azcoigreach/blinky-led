@@ -1,3 +1,11 @@
+from multiprocessing.sharedctypes import Value, Array
+from time import strftime
+import time
+import datetime
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 class led_clock():
     def __init__(self, *args, **kwargs):
         while True:

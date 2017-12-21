@@ -1,34 +1,9 @@
 #!/usr/bin/env python 2.7
-from time import strftime
-
-__author__ =        "Stranger Production, LLC"
-__created__ =       "23 January 2017"
-__modified__ =      "21 December 2017"
-__version__ =       "0.2.0"
-__description___ =  '''MASTER LED CONTROL PROGRAM 
-                    LED Board Project for Adafruit RGB-LED Hat 
-                    with 2x 32x64px LED boards.'''
-__changes__ =       ''' Version Changes
-                    0.0.1 + Add LED Matrix Class and Default Template with variables to populate.
-                          + led_clock module online in its own process and handing variables to
-                          the main led_update loop.
-                          +Added RSS Feed and BITLY ticker block
-                    0.0.2 o Fixing Code for scroller and RSS
-                    0.0.3 + Added now()+30minutes clock for RSS to Console
-                          + Moved clock to bottom right
-                          + Scrolling PPM ticker working - Need to move file open calls to slower process.
-                          o Cleaned code
-                    0.0.4 - Stop RSS feed
-                          + Add Pushbullet feed
-                    0.1.0 + Dockerized Application
-                    0.2.0 + added mongodb connection
-                    '''
-                        
-
 import time
+
 from multiprocessing import Process, Lock
 from multiprocessing.sharedctypes import Value, Array
-import datetime
+
 import feedparser, bitly_api
 import urllib2
 import json
@@ -36,22 +11,9 @@ import os
 import threading
 from PIL import Image, ImageFont, ImageDraw
 import random
-import logging
-from pushbullet import Pushbullet
-from pushbullet import Listener
-from pymongo import MongoClient
-import pprint
-from workers import *
-# import workers.led_update
-# import workers.tweet_query
-# import workers.led_clock
-# import workers.countdown_clock
-# import workers.rss_feed
-# import workers.weather
-# import workers.pb_query
 
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('led_master')
+
+from workers import *
 
 
 def main():
