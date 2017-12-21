@@ -79,7 +79,7 @@ if __name__ == "__main__":
         processes = {}
         n=0
         for app in apps:
-            instance = app.
+            instance = app()
             p = Process(target=instance.start_listener)
             p.start()
             processes[n] = (p, app) # Keep the process and the app to monitor or restart
