@@ -78,7 +78,7 @@ class RunText(BlinkyBase):
 
 def led_update(d):
     logger.debug(d)
-    # global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
+    global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
     
     d_time_now = d['time_now']
     d_count_down = d['count_down']
