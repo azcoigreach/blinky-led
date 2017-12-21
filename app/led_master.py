@@ -42,7 +42,7 @@ from pushbullet import Pushbullet
 from pushbullet import Listener
 from pymongo import MongoClient
 import pprint
-# from workers import *
+from workers import *
 
 import led_update
 # import workers.tweet_query
