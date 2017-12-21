@@ -82,37 +82,31 @@ class RunText(BlinkyBase):
             offscreenCanvas.Clear()
             self.clock = time_now.value
             self.count_down = count_down.value
-            graphics.DrawText(offscreenCanvas, count_font, 1, 31, count_color, self.count_down)
+            
+            #Lines
             graphics.DrawLine(offscreenCanvas, 0, 18, 128, 18, line_a_color)
             graphics.DrawLine(offscreenCanvas, 68, 19, 68, 32, line_a_color)
+            
+            # Top Twitter Ticker
+                if curr_tweet.value != '': 
+                    ticker = curr_tweet.value
+                    len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
+                    self.pos -= 1
+                    if (self.pos + len < 0):
+                        self.pos = offscreenCanvas.width
+            
+            #Bottom Right Clock
             graphics.DrawText(offscreenCanvas, time_font, 71, 31, time_color, self.clock)
+            
+            #Bottom Left Countdown Clock
+            graphics.DrawText(offscreenCanvas, count_font, 1, 31, count_color, self.count_down)
             graphics.DrawText(offscreenCanvas, count_label_font, 1, 25, count_label_color, 'NOT MY PRESIDENT!')
+            
+            # Bottom Right Weather Bug
             self.temp = str('%sF') % curr_temp.value
             graphics.DrawText(offscreenCanvas, count_wx_font, 104, 25, count_wx_color, self.temp)
-            if curr_tweet.value != '': 
-                ticker = curr_tweet.value
-                len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
-                self.pos -= 1
-                if (self.pos + len < 0):
-                    self.pos = offscreenCanvas.width
             
-            #print(ticker_ready.value)
-#             if ticker_ready.value == 1: 
-#                 self.image = Image.open(news_ticker.value)
-#                 img_width, img_height = self.image.size
-#                 len = img_width + led_width
-#                 self.pos -= 1
-#                 if (self.pos + len < 0):
-#                     self.pos = offscreenCanvas.width
-#                 offscreenCanvas.SetImage(self.image, self.pos, 0)
-#                 
-#             elif ticker_ready.value != 1: 
-#                 ticker = "Refreshing Data..."
-#                 len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
-#                 self.pos -= 1
-#                 if (self.pos + len < 0):
-#                     self.pos = offscreenCanvas.width
-                
+            # Refresh Rate    
             time.sleep(0.025)
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
@@ -155,94 +149,95 @@ class weather():
             time.sleep(900)
 
 
-# class rss_feed():
-#     def __init__(self, *args, **kwargs):
-#         self.BITLY_ACCESS_TOKEN = "b6eeb2e971399411b0c5ee15db56b2c353e97e9d"
-#         self.items=[]
-#         self.displayItems=[]
-#         self.feeds=["http://rss.cnn.com/rss/cnn_allpolitics.rss",
-#                     "http://hosted2.ap.org/atom/APDEFAULT/89ae8247abe8493fae24405546e9a1aa",
-#                     "http://feeds.reuters.com/Reuters/PoliticsNews"
-#                     ]
-#         dt = datetime.datetime
-#         self.font_name = "/usr/share/fonts/truetype/freefont/FreeMono.ttf"
-#         self.font_size = 17
-#         
-#         self.refresh_sec = 1800
-#         t = dt.now()
-#         print("News Fetched at %s\n") % t.strftime('%m/%d/%y %H:%M:%S')
-#               
-#         threading.Timer(self.refresh_sec, rss_feed).start()
-#         self.createLinks()
-#         
-#         self.fileQueue()
-#     def populateItems(self):
-#         ticker_ready.value = 0
-#         del self.items[:]
-#         del self.displayItems[:]
-#         os.system("find . -name \*.ppm -delete")
-#         
-#         for url in self.feeds:
-#             self.feed=feedparser.parse(url)
-#             posts=self.feed["items"]
-#             for post in posts:
-#                 self.items.append(post)
-#     
-#     def getConnection(self):
-#         access_token=self.BITLY_ACCESS_TOKEN
-#         bitly=bitly_api.Connection(access_token=access_token)
-#         return bitly    
-#     
-#     def createLinks(self):
-#         try:
-#             self.populateItems()
-#             bitlink=self.getConnection()
-#             for idx, item in enumerate(self.items):
-#                 data=bitlink.shorten(item["link"])
-#                 data=bitlink.shorten(item["link"])
-#                 self.writeImage(unicode(item["title"])+" bit.ly/"+data["hash"], idx)
-#                 print(unicode(item["title"]))
-#                 print("bit.ly/"+data["hash"]+"\n")
-#                 time.sleep(1)
-#         except ValueError:
-#             print("Could not create Bitly links")
-#             ticker_ready.value = 0
-#         
-#         finally:
-#             dt = datetime.datetime
-#             t = dt.now()+datetime.timedelta(seconds=self.refresh_sec)
-#             print("\nWill get more news at %s\n\n") % t.strftime('%m/%d/%y %H:%M:%S')
-#             ticker_ready.value = 1
-#             
-#     def writeImage(self, url, count):
-#         bitIndex=url.find("bit.ly")
-#         link, headLine=url[bitIndex:], url[:bitIndex]
-#         def randCol(self):
-#             return (random.randint(62,255), random.randint(62,255), random.randint(62,255))
-#         text = ((headLine, randCol(self)), (link, (10, 10, 255)))
-#         font = ImageFont.truetype(self.font_name, self.font_size)
-#         all_text = ""
-#         for text_color_pair in text:
-#             t = text_color_pair[0]
-#             all_text = all_text + t
-#         width, ignore = font.getsize(all_text)
-#         im = Image.new("RGB", (width + 1, 18), "black")
-#         draw = ImageDraw.Draw(im)
-#         x = 0;
-#         for text_color_pair in text:
-#             t = text_color_pair[0]
-#             c = text_color_pair[1]
-#             draw.text((x, 0), t, c, font=font)
-#             x = x + font.getsize(t)[0]
-#         filename=str(count)+".ppm"
-#         self.displayItems.append(filename)
-#         im.save(filename)
-#     
-#     def fileQueue(self):
-#         for disp in self.displayItems[:60]:
-#             news_ticker.value = disp
-#             print(news_ticker.value)
-#             time.sleep(30)
+class rss_feed():
+    def __init__(self, *args, **kwargs):
+        self.BITLY_ACCESS_TOKEN = "b6eeb2e971399411b0c5ee15db56b2c353e97e9d"
+        self.items=[]
+        self.displayItems=[]
+        self.feeds=["http://rss.cnn.com/rss/cnn_allpolitics.rss",
+                    # "http://hosted2.ap.org/atom/APDEFAULT/89ae8247abe8493fae24405546e9a1aa",
+                    # "http://feeds.reuters.com/Reuters/PoliticsNews"
+                    ]
+        dt = datetime.datetime
+        self.font_name = "/usr/share/fonts/truetype/freefont/FreeMono.ttf"
+        self.font_size = 17
+        
+        self.refresh_sec = 1800
+        t = dt.now()
+        print("News Fetched at %s\n") % t.strftime('%m/%d/%y %H:%M:%S')
+              
+        threading.Timer(self.refresh_sec, rss_feed).start()
+        self.createLinks()
+        
+        self.fileQueue()
+    
+    def populateItems(self):
+        ticker_ready.value = 0
+        del self.items[:]
+        del self.displayItems[:]
+        os.system("find . -name \*.ppm -delete")
+        
+        for url in self.feeds:
+            self.feed=feedparser.parse(url)
+            posts=self.feed["items"]
+            for post in posts:
+                self.items.append(post)
+    
+    def getConnection(self):
+        access_token=self.BITLY_ACCESS_TOKEN
+        bitly=bitly_api.Connection(access_token=access_token)
+        return bitly    
+    
+    def createLinks(self):
+        try:
+            self.populateItems()
+            bitlink=self.getConnection()
+            for idx, item in enumerate(self.items):
+                data=bitlink.shorten(item["link"])
+                data=bitlink.shorten(item["link"])
+                self.writeImage(unicode(item["title"])+" bit.ly/"+data["hash"], idx)
+                print(unicode(item["title"]))
+                print("bit.ly/"+data["hash"]+"\n")
+                time.sleep(1)
+        except ValueError:
+            print("Could not create Bitly links")
+            ticker_ready.value = 0
+        
+        finally:
+            dt = datetime.datetime
+            t = dt.now()+datetime.timedelta(seconds=self.refresh_sec)
+            print("\nWill get more news at %s\n\n") % t.strftime('%m/%d/%y %H:%M:%S')
+            ticker_ready.value = 1
+            
+    def writeImage(self, url, count):
+        bitIndex=url.find("bit.ly")
+        link, headLine=url[bitIndex:], url[:bitIndex]
+        def randCol(self):
+            return (random.randint(62,255), random.randint(62,255), random.randint(62,255))
+        text = ((headLine, randCol(self)), (link, (10, 10, 255)))
+        font = ImageFont.truetype(self.font_name, self.font_size)
+        all_text = ""
+        for text_color_pair in text:
+            t = text_color_pair[0]
+            all_text = all_text + t
+        width, ignore = font.getsize(all_text)
+        im = Image.new("RGB", (width + 1, 18), "black")
+        draw = ImageDraw.Draw(im)
+        x = 0;
+        for text_color_pair in text:
+            t = text_color_pair[0]
+            c = text_color_pair[1]
+            draw.text((x, 0), t, c, font=font)
+            x = x + font.getsize(t)[0]
+        filename=str(count)+".ppm"
+        self.displayItems.append(filename)
+        im.save(filename)
+    
+    def fileQueue(self):
+        for disp in self.displayItems[:60]:
+            news_ticker.value = disp
+            print(news_ticker.value)
+            time.sleep(30)
 
 class pb_main():
     def __init__(self, *args, **kwargs):
@@ -314,19 +309,19 @@ if __name__ == "__main__":
         rt.start()
 
         #Start LED_CLOCK LOOP
-        # rt = Process(target=led_clock)
-        # jobs.append(rt)
-        # rt.start()
+        rt = Process(target=led_clock, name='led_clock')
+        jobs.append(rt)
+        rt.start()
         
-        #Start LED_CLOCK LOOP
-        # rt = Process(target=countdown_clock)
-        # jobs.append(rt)
-        # rt.start()
+        #Start COUNTDOWN_CLOCK LOOP
+        rt = Process(target=countdown_clock, name='countdown_clock')
+        jobs.append(rt)
+        rt.start()
         
-        #Start Weather Updater
-        # rt = Process(target=weather)
-        # jobs.append(rt)
-        # rt.start()
+        #Start WEATHER LOOP
+        rt = Process(target=weather, name='weather')
+        jobs.append(rt)
+        rt.start()
         
         #Start RSS Feed Updater
         # rt = Process(target=rss_feed)
