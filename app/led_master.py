@@ -11,7 +11,7 @@ logger.setLevel(logging.DEBUG)
 if __name__ == "__main__":
     try:
         logger.warning('Work Started: PID %d', os.getpid())
-        while Manager() as manager:
+        with Manager() as manager:
             d = manager.dict()
             d = {'time_now': b'88/88/88 88:88', 'count_down': b'8888Days 88H 88M', 'curr_temp':888.8, 'news_ticker':b'0.ppm', 'curr_tweet':b'screen_name: xxxx : ddd mmm DD HH:MM:SS +0000 YYYY'}
             logger.debug(d)
