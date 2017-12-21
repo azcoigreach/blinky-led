@@ -365,5 +365,5 @@ if __name__ == "__main__":
         for j in jobs:
             j.terminate()
             time.sleep(2)
-            logger.warning(j, j.is_alive())
+            logger.warning('Shutting Down: %s %s', j, j.is_alive())
     
