@@ -209,7 +209,7 @@ class rss_feed():
         finally:
             dt = datetime.datetime
             t = dt.now()+datetime.timedelta(seconds=self.refresh_sec)
-            info("Will get more news at %s"), t.strftime('%m/%d/%y %H:%M:%S'))
+            logger.info("Will get more news at %s"), t.strftime('%m/%d/%y %H:%M:%S'))
             ticker_ready.value = 1
             
     def writeImage(self, url, count):
