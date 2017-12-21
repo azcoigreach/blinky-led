@@ -77,7 +77,7 @@ class RunText(BlinkyBase):
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
 def led_update(d):
-    logger.debug(d)
+    # logger.debug(d)
     global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
     
     d_time_now = d['time_now']
