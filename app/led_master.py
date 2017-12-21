@@ -16,7 +16,7 @@ if __name__ == "__main__":
         apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
         processes = {}
         n=0
-        with Manager() as manager
+        with Manager() as manager:
             for app in apps:
                 instance = app(d)
                 pprint.pprint(instance)
