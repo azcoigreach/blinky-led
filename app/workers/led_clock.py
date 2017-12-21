@@ -9,6 +9,7 @@ logger.setLevel(logging.DEBUG)
 
 class led_clock():
     def __init__(self, *args, **kwargs):
+        logger.warning('Init Clock')
         logger.debug(d)
         while True:
             dt = datetime.datetime

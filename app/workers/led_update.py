@@ -14,7 +14,7 @@ logger.setLevel(logging.WARNING)
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
         super(RunText, self).__init__(*args, **kwargs)
-        logger.info('Init LED Loop')
+        logger.warning('Init LED Loop')
 
     def Run(self):
         offscreenCanvas = self.matrix.CreateFrameCanvas()
