@@ -44,7 +44,7 @@ from pymongo import MongoClient
 import pprint
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger('led_master')
 
 
