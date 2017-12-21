@@ -32,6 +32,7 @@ if __name__ == "__main__":
         manager = Manager()
         
         #Process Variables
+        
         time_now = manager.Array('c', b'88/88/88 88:88') 
         count_down = manager.Array('c', b'8888Days 88H 88M')
         curr_temp = manager.Value('d', 888.8)
