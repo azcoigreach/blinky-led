@@ -6,7 +6,7 @@ import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
-class led_clock(d):
+class led_clock():
     def __init__(self, *args, **kwargs):
         logger.debug(d)
         while True:
