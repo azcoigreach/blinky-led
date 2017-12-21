@@ -3,8 +3,9 @@ from time import strftime
 import time
 import datetime
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
+logger = logger.setLevel('WARNING')
 
 class led_clock():
     def __init__(self, *args, **kwargs):
