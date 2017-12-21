@@ -4,11 +4,13 @@ import pprint
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-global d
-logger.debug(d)
+
 
 class tweet_query(d):
     def __init__(self, *args, **kwargs):
+        manager = Manager()
+        d = manager.dict()
+        logger.debug(d)
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
         logger.warning('tweet_query started')
