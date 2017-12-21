@@ -317,7 +317,7 @@ if __name__ == "__main__":
         ticker_ready = Value('i', 0)
         curr_tweet = Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
         
-        apps = ['led_update'] #,'tweet_query','led_clock','countdown_clock','weather'
+        apps = ['led_update','tweet_query','led_clock','countdown_clock','weather'] 
         processes = {}
         n=0
         for app in apps:
@@ -337,7 +337,7 @@ if __name__ == "__main__":
                     logger.warning('Process Ended with an error or a terminate', a)
                     # Handle this either by restarting or delete the entry so it is removed from list as for else
                 else:
-                    logger.warning('finished',a)
+                    logger.warning('finished', a)
                     p.join() # Allow tidyup
                     del processes[n] # Removed finished items from the dictionary 
                     # When none are left then loop will end
