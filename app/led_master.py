@@ -340,7 +340,8 @@ if __name__ == "__main__":
                     p.join() # Allow tidyup
                     del processes[n] # Removed finished items from the dictionary 
                     # When none are left then loop will end
-    logger.warning('FINISHED')
+        
+        
         # #Start TWEET_QUERY LOOP
         # rt = Process(target=tweet_query, name='tweet_query')
         # jobs.append(rt)
