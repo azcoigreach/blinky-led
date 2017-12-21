@@ -15,6 +15,10 @@ import random
 
 from workers import *
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('MASTER')
+
 
 def main():
     pass
