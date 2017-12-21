@@ -2,11 +2,12 @@ from multiprocessing import Process, Manager
 from pymongo import MongoClient
 import pprint
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+logger.debug(d)
 
-class tweet_query(self,d):
+class tweet_query(d):
     def __init__(self, *args, **kwargs):
         global d
         client = MongoClient('192.168.1.240', 27017)
