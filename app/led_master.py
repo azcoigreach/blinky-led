@@ -298,7 +298,7 @@ if __name__ == "__main__":
         curr_tweet = Array('c', b'username: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', lock=lock) 
         
         #Start TWEET_QUERY LOOP
-        rt = Process(target=tweet_query, name='tweet_query')
+        rt = Process(target=tweet_query)
         jobs.append(rt)
         rt.start
 
