@@ -1,6 +1,6 @@
 from blinkybase import BlinkyBase
 from rgbmatrix import graphics
-from multiprocessing import Process, Lock, Manager, Value
+from multiprocessing import Process, Lock, Manager, Value, Array
 # from multiprocessing.sharedctypes import Value, Array
 
 import logging
