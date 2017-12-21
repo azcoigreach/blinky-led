@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 
-class RunText(BlinkyBase):
+class RunText(BlinkyBase,d):
     def __init__(self, *args, **kwargs):
         super(RunText, self).__init__(*args, **kwargs)
         logger.info('Init LED Loop')
