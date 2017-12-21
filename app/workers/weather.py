@@ -1,9 +1,9 @@
-from multiprocessing import Process, Lock, Manager
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-class weather():
+
+class weather(d):
     def __init__(self, *args, **kwargs):
         while True:
             logger.warning('Fetching weather.')
@@ -13,7 +13,7 @@ class weather():
             location = parsed_json['location']['city']
             t = parsed_json['current_observation']['temp_f']
             self.temp = t
-            curr_temp.value = self.temp
-            logger.info('Temp Update: %s', curr_temp.value)
+            d['curr_temp'] = self.temp
+            logger.info('Temp Update: %s', d['curr_temp'])
             time.sleep(900)
 

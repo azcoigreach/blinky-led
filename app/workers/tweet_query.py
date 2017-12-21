@@ -1,13 +1,11 @@
-from multiprocessing import Process, Lock, Manager
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
 from pymongo import MongoClient
 import pprint
-
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class tweet_query():
+class tweet_query(d):
     def __init__(self, *args, **kwargs):
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
@@ -19,7 +17,7 @@ class tweet_query():
                 result = db.twitter_query.find_one(query, projection)
                 self.output = str(result['user']['screen_name'] + ': ' + result['text'] + ': ' + result['created_at']).encode('ascii','ignore')
                 logger.info('Tweet: %s', self.output)
-                curr_tweet.value = self.output
+                d['curr_tweet'] = self.output
             except Exception as err:
                 logger.error('Tweet Query Error: %s', err)
                 time.sleep(10)

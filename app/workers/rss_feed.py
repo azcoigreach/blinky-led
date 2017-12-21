@@ -1,5 +1,10 @@
-from multiprocessing import Process, Lock, Manager
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
+import threading
+import feedparser, bitly_api
+import urllib2
+import json
+import random
+from PIL import Image, ImageFont, ImageDraw
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

@@ -1,14 +1,13 @@
-from multiprocessing import Process, Lock, Manager
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
 from pushbullet import Pushbullet
 from pushbullet import Listener
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-class pb_query():
+class pb_query(d):
     def __init__(self, *args, **kwargs):
-        logger.warning('PB Started...')
+        logger.warning('Pushbullet Started...')
         pb_limit = 20
         pb_interval = 20
         pb_auth_token = 'o.1mYHkPzpFzSXHF4M2UcGhit6zyZQ98tM'
@@ -30,4 +29,5 @@ class pb_query():
                         pass
                     count = count + 1
                 else:
-                    pb_main()
+                    pass
+      

@@ -1,58 +1,29 @@
 #!/usr/bin/env python 2.7
 import time
-
 from multiprocessing import Process, Manager
-# from multiprocessing.sharedctypes import Value, Array
-
-import feedparser, bitly_api
-import urllib2
-import json
 import os
-import threading
-from PIL import Image, ImageFont, ImageDraw
-import random
-
-
 from workers import *
-
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('MASTER')
-
-
-def main():
-    pass
 
 if __name__ == "__main__":
     try:
         logger.warning('Work Started: PID %d', os.getpid())
         
-        jobs = []
-        # lock = Lock()
-        manager = Manager()
-         
-        #Process Variables
-
-        time_now = manager.Array('c', b'88/88/88 88:88') 
-        count_down = manager.Array('c', b'8888Days 88H 88M')
-        curr_temp = manager.Value('d', 888.8)
-        news_ticker = manager.Array('c', b'9999.ppm')
-        news_ticker.value = str('0.ppm')
-        ticker_ready = manager.Value('i', 0)
-        curr_tweet = manager.Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY') 
-     
         d={'time_now': b'88/88/88 88:88', 'count_down': b'8888Days 88H 88M', 'curr_temp':888.8, 'news_ticker':b'0.ppm', 'curr_tweet':b'screen_name: xxxx : ddd mmm DD HH:MM:SS +0000 YYYY'}
 
         apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
         processes = {}
         n=0
-        for app in apps:
-            instance = app(d)
-            pprint.pprint(instance)
-            p = Process(target=instance.start_listener, args=(d,))
-            p.start()
-            processes[n] = (p, app) # Keep the process and the app to monitor or restart
-            n += 1
+        with Manager() as manager
+            for app in apps:
+                instance = app(d)
+                pprint.pprint(instance)
+                p = Process(target=instance.start_listener, args=(d,))
+                p.start()
+                processes[n] = (p, app)
+                n += 1
 
         while len(processes) > 0:
             for n in processes.keys():
@@ -70,50 +41,11 @@ if __name__ == "__main__":
                     del processes[n] # Removed finished items from the dictionary 
                     # When none are left then loop will end
         
-        
-        # #Start TWEET_QUERY LOOP
-        # rt = Process(target=tweet_query, name='tweet_query')
-        # jobs.append(rt)
-        # rt.start()
-
-        # #Start LED_CLOCK LOOP
-        # rt = Process(target=led_clock, name='led_clock')
-        # jobs.append(rt)
-        # rt.start()
-        
-        # #Start COUNTDOWN_CLOCK LOOP
-        # rt = Process(target=countdown_clock, name='countdown_clock')
-        # jobs.append(rt)
-        # rt.start()
-        
-        # #Start WEATHER LOOP
-        # rt = Process(target=weather, name='weather')
-        # jobs.append(rt)
-        # rt.start()
-        
-        # #Start RSS Feed Updater
-        # # rt = Process(target=rss_feed)
-        # # jobs.append(rt)
-        # # rt.start()
-        
-        # #Start Pushbullet Listener
-        # # rt = Process(target=pb_main)
-        # # jobs.append(rt)
-        # # rt.start()
-        
-        # #Start LED UPDATE LOOP
-        # rt = Process(target=led_update, name='led_update')
-        # jobs.append(rt)
-        # rt.start()
-        
-        # #JOIN ALL JOBS
-        # for j in jobs:
-        #     j.join()
-        #     logger.info(j)
             
     except KeyboardInterrupt:
-        for j in jobs:
-            j.terminate()
+        for n in processes.keys():
+            (p, a) = processes[n]
+            p.terminate()
             time.sleep(2)
-            logger.warning('Shutting Down: %s %s', j, j.is_alive())
+            logger.warning('Shutting Down: %s %s', p, p.is_alive())
     

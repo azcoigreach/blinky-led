@@ -2,13 +2,12 @@ import time
 from blinkybase import BlinkyBase
 from rgbmatrix import graphics
 from multiprocessing import Process, Manager
-# from multiprocessing.sharedctypes import Value, Array
-
+import pprint
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-import pprint
+
 
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
