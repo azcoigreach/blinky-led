@@ -2,7 +2,7 @@
 import time
 
 from multiprocessing import Process, Lock, Manager
-from multiprocessing.sharedctypes import Value, Array
+# from multiprocessing.sharedctypes import Value, Array
 
 import feedparser, bitly_api
 import urllib2
