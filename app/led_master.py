@@ -322,7 +322,7 @@ if __name__ == "__main__":
         n=0
         for app in apps:
             logger.debug(app)
-            instance = app()
+            instance = app(self)
             p = Process(target=instance.start_listener)
             p.start()
             processes[n] = (p, app) # Keep the process and the app to monitor or restart
