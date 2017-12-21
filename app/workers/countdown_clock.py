@@ -3,12 +3,12 @@ from multiprocessing.sharedctypes import Value, Array
 import time
 import datetime
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 class countdown_clock():
     def __init__(self, *args, **kwargs):
-        global d
+        logger.debug(d)
         while True:
             dt = datetime.datetime
             count = dt(2021,1,21,9) - dt.now()
