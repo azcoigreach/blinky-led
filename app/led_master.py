@@ -30,9 +30,7 @@ if __name__ == "__main__":
         jobs = []
         lock = Lock()
         manager = Manager()
-        
-        global time_now
-
+         
         #Process Variables
 
         time_now = manager.Array('c', b'88/88/88 88:88') 
@@ -50,7 +48,7 @@ if __name__ == "__main__":
         for app in apps:
             instance = app()
             pprint.pprint(instance)
-            p = Process(target=instance.start_listener)
+            p = Process(target=instance.start_listener, args=(time_now,count_down,curr_temp,news_ticker,curr_tweet,lock))
             p.start()
             processes[n] = (p, app) # Keep the process and the app to monitor or restart
             n += 1

@@ -1,13 +1,13 @@
 from blinkybase import BlinkyBase
 from rgbmatrix import graphics
-from multiprocessing import Process, Lock, Manager, Value, Array
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
+# from multiprocessing.sharedctypes import Value, Array
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-global time_now
+
 
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
@@ -45,7 +45,7 @@ class RunText(BlinkyBase):
         
         while True:
             offscreenCanvas.Clear()
-            self.clock = time_now.value
+            self.clock = d['time_now']
             self.count_down = count_down.value
             
             #Lines
@@ -75,7 +75,8 @@ class RunText(BlinkyBase):
             time.sleep(0.025)
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
-def led_update():
-    parser = RunText()
+def led_update(d):
+    
+    parser = RunText(d)
     if (not parser.process()):
         parser.print_help()
