@@ -43,8 +43,14 @@ from pushbullet import Listener
 from pymongo import MongoClient
 import pprint
 
-logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger('led_master')
+hdlr = logging.FileHandler('/var/tmp/led_master.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr) 
+logger.setLevel(logging.DEBUG)
+
 
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
@@ -140,7 +146,7 @@ class countdown_clock():
 class weather():
     def __init__(self, *args, **kwargs):
         while True:
-            logger.debug('Fetching weather.')
+            logger.warning('Fetching weather.')
             f = urllib2.urlopen('http://api.wunderground.com/api/38c037db62bd609c/geolookup/conditions/q/AZ/Goodyear.json')
             json_string = f.read()
             parsed_json = json.loads(json_string)
@@ -187,8 +193,14 @@ class rss_feed():
                 self.items.append(post)
     
     def getConnection(self):
-        access_token=self.BITLY_ACCESS_TOKEN
-        bitly=bitly_api.Connection(access_token=access_token)
+        try:
+            access_token=self.BITLY_ACCESS_TOKEN
+            bitly=bitly_api.Connection(access_token=access_token)
+            logger.warning('Connected to Bitly')
+        except Exception as err:
+            logger.error('Bitly error: %s', err)
+            time.sleep(30)
+            getConnection()
         return bitly    
     
     def createLinks(self):
@@ -244,7 +256,7 @@ class rss_feed():
 
 class pb_main():
     def __init__(self, *args, **kwargs):
-        logger.info('PB Started...')
+        logger.warning('PB Started...')
         pb_limit = 20
         pb_interval = 20
         pb_auth_token = 'o.1mYHkPzpFzSXHF4M2UcGhit6zyZQ98tM'
@@ -273,7 +285,7 @@ class tweet_query():
     def __init__(self, *args, **kwargs):
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
-        logger.info('tweet_query started')
+        logger.warning('tweet_query started')
         while True:
             try:
                 query = { '$query' : {}, '$orderby' : { '$natural' : -1 } }
@@ -294,7 +306,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        logger.info('Work Started: PID %d', os.getpid())
+        logger.warning('Work Started: PID %d', os.getpid())
         
         jobs = []
         lock = Lock()
