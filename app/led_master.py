@@ -42,15 +42,14 @@ from pushbullet import Pushbullet
 from pushbullet import Listener
 from pymongo import MongoClient
 import pprint
-from workers import *
 
-import led_update
-# import workers.tweet_query
-# import workers.led_clock
-# import workers.countdown_clock
-# import workers.rss_feed
-# import workers.weather
-# import workers.pb_query
+import workers.led_update
+import workers.tweet_query
+import workers.led_clock
+import workers.countdown_clock
+import workers.rss_feed
+import workers.weather
+import workers.pb_query
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('led_master')
