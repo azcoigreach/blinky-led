@@ -3,3 +3,4 @@ Pillow
 feedparser
 bitly_api
 pushbullet.py
+pymongo==3.6.0
