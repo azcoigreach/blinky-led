@@ -24,7 +24,8 @@ if __name__ == "__main__":
                 p.start()
                 processes[n] = (p, app)
                 n += 1
-                logger.emit('Procs Started: %s ', p, p.is_alive())
+                logger.warning('Procs Started: %s ', p, p.is_alive())
+                time.sleep(0.25)
 
         while len(processes) > 0:
             for n in processes.keys():
