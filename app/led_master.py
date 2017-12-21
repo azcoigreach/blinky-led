@@ -8,6 +8,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('MASTER')
 logger.setLevel(logging.DEBUG)
 
+import pprint
+
 if __name__ == "__main__":
     try:
         logger.warning('Work Started: PID %d', os.getpid())
@@ -24,7 +26,8 @@ if __name__ == "__main__":
                 p.start()
                 processes[n] = (p, app)
                 n += 1
-                logger.warning('Procs Started: %s ', p, p.is_alive())
+                pprint.pprint('Procs Started: %s ', p, p.is_alive())
+                # logger.warning('Procs Started: %s ', p, p.is_alive())
 
         while len(processes) > 0:
             for n in processes.keys():
