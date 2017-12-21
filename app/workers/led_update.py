@@ -45,7 +45,7 @@ class RunText(BlinkyBase,d):
         
         while True:
             offscreenCanvas.Clear()
-            self.clock = d['time_now']
+            self.clock = d[time_now]
             self.count_down = count_down.value
             
             #Lines
