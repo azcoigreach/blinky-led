@@ -7,7 +7,7 @@ logger.setLevel(logging.WARNING)
 
 class weather():
     def __init__(self, *args, **kwargs):
-        # logger.debug(d)
+        logger.debug(d)
         while True:
             logger.warning('Fetching weather.')
             f = urllib2.urlopen('http://api.wunderground.com/api/38c037db62bd609c/geolookup/conditions/q/AZ/Goodyear.json')
