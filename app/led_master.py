@@ -45,10 +45,6 @@ import pprint
 
 
 logger = logging.getLogger('led_master')
-hdlr = logging.FileHandler('/var/tmp/led_master.log')
-formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-hdlr.setFormatter(formatter)
-logger.addHandler(hdlr) 
 logger.setLevel(logging.INFO)
 
 
