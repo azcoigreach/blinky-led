@@ -5,7 +5,7 @@ import datetime
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.DEBUG)
 
 class led_clock():
     def __init__(self, *args, **kwargs):
@@ -16,3 +16,4 @@ class led_clock():
             d['time_now'] = t.strftime('%m/%d/%y %H:%M')
             logger.debug('Current Time: %s',d['time_now'])
             time.sleep(2)
+
