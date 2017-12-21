@@ -322,11 +322,10 @@ if __name__ == "__main__":
         processes = {}
         n=0
         for app in apps:
-            print(type(app))
-        #     p = Process(target=str(app))
-        #     p.start()
-        #     processes[n] = (p, app) # Keep the process and the app to monitor or restart
-        #     n += 1
+            p = Process(target=app)
+            p.start()
+            # processes[n] = (p, app) # Keep the process and the app to monitor or restart
+            n += 1
 
         # while len(processes) > 0:
         #     for n in processes.keys():
