@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class led_clock(d):
     def __init__(self, *args, **kwargs):
-        global d
+        logger.debug(d)
         while True:
             dt = datetime.datetime
             t = dt.now()
