@@ -21,7 +21,7 @@ if __name__ == "__main__":
         while True:
             for app in apps:
                 instance = app(d)
-                # pprint.pprint(instance)
+                logger.debug(instance)
                 p = Process(target=instance.start_listener, args=(d,))
                 p.start()
                 processes[n] = (p, app)
@@ -47,7 +47,8 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         for n in processes.keys():
             (p, a) = processes[n]
+            logger.warning('Shutting Down: %s %s', p, p.is_alive())
             p.terminate()
             time.sleep(2)
-            logger.warning('Shutting Down: %s %s', p, p.is_alive())
+            
     
