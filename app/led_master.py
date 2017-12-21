@@ -268,13 +268,11 @@ class tweet_query():
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
         while True:
-            query = { 'in_reply_to_screen_name' : 'realDonaldTrump' }
-            projection = { '_id' : 0, 'user.screen_name' : 1, 'text' : 1 }
-            sort = '{ "$natural": -1 }'
-            limit = 1
-            results = db.twitter_query.find(query, projection).sort(sort).limit(limit)
-            for i in results:
-                print(i['user']['screen_name'] + ': ' + i['text']).encode('ascii','ignore')
+            query = { '$query' : {}, '$orderby' : { '$natural' : -1 } }
+            projection = { '_id' : 0, 'user.screen_name' : 1, 'text' : 1 ,'created_at' : 1}
+            result = db.twitter_query.find_one(query, projection)
+            output = str(result['user']['screen_name'] + ': ' + result['text'] + ': ' + result['created_at']).encode('ascii','ignore')
+            print(output)
             time.sleep(15)
 
 
