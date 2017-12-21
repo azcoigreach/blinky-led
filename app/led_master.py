@@ -6,7 +6,7 @@ from workers import *
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('MASTER')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 if __name__ == "__main__":
     try:
