@@ -300,7 +300,7 @@ if __name__ == "__main__":
         #Start TWEET_QUERY LOOP
         rt = Process(target=tweet_query)
         jobs.append(rt)
-        rt.start
+        rt.start()
 
         #Start LED_CLOCK LOOP
         # rt = Process(target=led_clock)
