@@ -39,6 +39,8 @@ import random
 import logging
 from pushbullet import Pushbullet
 from pushbullet import Listener
+from pymongo import MongoClient
+import pprint
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -260,7 +262,22 @@ class pb_main():
                 else:
                     pb_main()
     
-            
+
+class tweet_query():
+    def __init__(self, *args, **kwargs):
+        client = MongoClient('192.168.1.240', 27017)
+        db = client.twitter_stream
+        while True:
+            query = db.twitter_query.aggregate([
+                { '_id':{'$exists':1}},
+                {'$project': {'_id':0, 'user.screen_name': 1, 'text':1}},
+                {'$sort':{'$natual':-1},
+                { '$limit' : 1 } ])
+            try
+            pprint.pprint(results)
+            time.sleep(15)
+
+
 def main():
     pass
 
@@ -279,8 +296,13 @@ if __name__ == "__main__":
         news_ticker = Array('c', b'9999.ppm' ,lock=lock)
         news_ticker.value = str('0.ppm')
         ticker_ready = Value('i', 0)
+        curr_tweet = Array('c', b'username: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', lock=lock) 
         
-        
+        #Start TWEET_QUERY LOOP
+        rt = Process(target=tweet_query, name='tweet_query')
+        jobs.append(rt)
+        rt.start
+
         #Start LED_CLOCK LOOP
         rt = Process(target=led_clock)
         jobs.append(rt)
