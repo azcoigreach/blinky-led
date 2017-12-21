@@ -1,7 +1,7 @@
 #!/usr/bin/env python 2.7
 import time
 
-from multiprocessing import Process, Lock, Manager
+from multiprocessing import Process, Lock, Manager, Value, Array
 # from multiprocessing.sharedctypes import Value, Array
 
 import feedparser, bitly_api
