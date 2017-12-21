@@ -44,7 +44,7 @@ from pymongo import MongoClient
 import pprint
 
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('led_master')
 
 
@@ -321,6 +321,7 @@ if __name__ == "__main__":
         processes = {}
         n=0
         for app in apps:
+            logger.debug(app)
             instance = app()
             p = Process(target=instance.start_listener)
             p.start()
