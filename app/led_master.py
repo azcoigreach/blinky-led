@@ -269,11 +269,12 @@ class tweet_query():
         db = client.twitter_stream
         while True:
             query = { 'in_reply_to_screen_name' : 'realDonaldTrump' }
-            projection = { '_id' : 0, 'user.screen_name' : 1 , 'text' : 1 }
+            projection = { '_id' : 0, 'user.screen_name' : 1, 'text' : 1 }
             sort = '{ "$natural": -1 }'
             limit = 1
             results = db.twitter_query.find(query, projection).sort(sort).limit(limit)
-            pprint.pprint(results)
+            for i in results:
+                print(i['user']['screen_name'] + ': ' + i['text']).encode('ascii','ignore')
             time.sleep(15)
 
 
