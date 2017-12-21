@@ -5,9 +5,11 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+global d
+
 class tweet_query(d):
     def __init__(self, *args, **kwargs):
-        global d
+       
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
         logger.warning('tweet_query started')
