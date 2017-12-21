@@ -45,7 +45,7 @@ class RunText(BlinkyBase):
         
         while True:
             offscreenCanvas.Clear()
-            logger.debug(d_time_now)
+            # logger.debug(d_time_now)
             self.clock = d_time_now
             self.count_down = d_count_down
             
