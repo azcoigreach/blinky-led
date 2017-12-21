@@ -46,7 +46,7 @@ class RunText(BlinkyBase):
         while True:
             offscreenCanvas.Clear()
 
-            self.clock = self.led[time_now]
+            self.clock = self.d[time_now]
             self.count_down = count_down.value
             
             #Lines
@@ -77,8 +77,8 @@ class RunText(BlinkyBase):
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
 def led_update(d):
-    global led
-    led = d
-    parser = RunText(led)
+    
+    
+    parser = RunText(self.d)
     if (not parser.process()):
         parser.print_help()
