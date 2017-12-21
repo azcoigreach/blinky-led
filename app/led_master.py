@@ -324,7 +324,7 @@ if __name__ == "__main__":
             instance = app
             p = Process(target=app)
             p.start()
-            processes[n] = (p, a) # Keep the process and the app to monitor or restart
+            processes[n] = (p, str(app)) # Keep the process and the app to monitor or restart
             n += 1
 
         while len(processes) > 0:
