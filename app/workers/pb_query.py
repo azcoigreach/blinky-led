@@ -8,7 +8,7 @@ logger.setLevel(logging.WARNING)
 
 class pb_query():
     def __init__(self, *args, **kwargs):
-        # info.debug(d)
+        info.debug(d)
         logger.warning('Pushbullet Started...')
         pb_limit = 20
         pb_interval = 20

@@ -10,6 +10,7 @@ logger.setLevel(logging.WARNING)
 
 class tweet_query():
     def __init__(self, *args, **kwargs):
+        logger.warning('Init Tweet Query')
         logger.debug(d)
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream

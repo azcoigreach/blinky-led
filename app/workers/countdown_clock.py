@@ -8,6 +8,7 @@ logger.setLevel(logging.WARNING)
 
 class countdown_clock():
     def __init__(self, *args, **kwargs):
+        logger.warning('Countdown Clock')
         logger.debug(d)
         while True:
             dt = datetime.datetime
