@@ -75,7 +75,7 @@ if __name__ == "__main__":
         curr_tweet = Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
      
 
-        apps = [workers.led_update, workers.tweet_query, workers.led_clock, workers.countdown_clock, workers.weather] 
+        apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
         processes = {}
         n=0
         for app in apps:
