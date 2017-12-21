@@ -2,8 +2,9 @@ from multiprocessing import Process, Manager
 from pymongo import MongoClient
 import pprint
 import logging
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
+
 
 
 class tweet_query():

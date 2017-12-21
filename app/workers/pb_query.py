@@ -2,8 +2,8 @@ from multiprocessing import Process, Manager
 from pushbullet import Pushbullet
 from pushbullet import Listener
 import logging
-logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
 
 class pb_query():
     def __init__(self, *args, **kwargs):

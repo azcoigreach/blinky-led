@@ -6,8 +6,9 @@ import json
 import random
 from PIL import Image, ImageFont, ImageDraw
 import logging
-logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.WARNING)
+
 
 class rss_feed():
     def __init__(self, *args, **kwargs):
