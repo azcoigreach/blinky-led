@@ -2,12 +2,12 @@ from multiprocessing import Process, Manager
 from pushbullet import Pushbullet
 from pushbullet import Listener
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
-class pb_query(d):
+class pb_query():
     def __init__(self, *args, **kwargs):
-        global d
+        info.debug(d)
         logger.warning('Pushbullet Started...')
         pb_limit = 20
         pb_interval = 20
