@@ -3,8 +3,8 @@ from time import strftime
 
 __author__ =        "Stranger Production, LLC"
 __created__ =       "23 January 2017"
-__modified__ =      "05 December 2017"
-__version__ =       "0.1.0"
+__modified__ =      "21 December 2017"
+__version__ =       "0.2.0"
 __description___ =  '''MASTER LED CONTROL PROGRAM 
                     LED Board Project for Adafruit RGB-LED Hat 
                     with 2x 32x64px LED boards.'''
@@ -21,6 +21,7 @@ __changes__ =       ''' Version Changes
                     0.0.4 - Stop RSS feed
                           + Add Pushbullet feed
                     0.1.0 + Dockerized Application
+                    0.2.0 + added mongodb connection
                     '''
                         
 from blinkybase import BlinkyBase
@@ -42,12 +43,13 @@ from pushbullet import Listener
 from pymongo import MongoClient
 import pprint
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('led_master')
 
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
         super(RunText, self).__init__(*args, **kwargs)
-        print('Init LED Loop')
+        logger.info('Init LED Loop')
 
     def Run(self):
         offscreenCanvas = self.matrix.CreateFrameCanvas()
@@ -138,6 +140,7 @@ class countdown_clock():
 class weather():
     def __init__(self, *args, **kwargs):
         while True:
+            logger.debug('Fetching weather.')
             f = urllib2.urlopen('http://api.wunderground.com/api/38c037db62bd609c/geolookup/conditions/q/AZ/Goodyear.json')
             json_string = f.read()
             parsed_json = json.loads(json_string)
@@ -145,7 +148,7 @@ class weather():
             t = parsed_json['current_observation']['temp_f']
             self.temp = t
             curr_temp.value = self.temp
-            print('Temp Update: %s' % curr_temp.value)
+            logger.info('Temp Update: %s', curr_temp.value)
             time.sleep(900)
 
 
@@ -164,7 +167,7 @@ class rss_feed():
         
         self.refresh_sec = 1800
         t = dt.now()
-        print("News Fetched at %s\n") % t.strftime('%m/%d/%y %H:%M:%S')
+        logger.info("News Fetched at %s\n",t.strftime('%m/%d/%y %H:%M:%S'))
               
         threading.Timer(self.refresh_sec, rss_feed).start()
         self.createLinks()
@@ -196,17 +199,17 @@ class rss_feed():
                 data=bitlink.shorten(item["link"])
                 data=bitlink.shorten(item["link"])
                 self.writeImage(unicode(item["title"])+" bit.ly/"+data["hash"], idx)
-                print(unicode(item["title"]))
-                print("bit.ly/"+data["hash"]+"\n")
+                logger.info('Bitly: %s',unicode(item["title"]))
+                logger.info("bit.ly/%s",data["hash"])
                 time.sleep(1)
         except ValueError:
-            print("Could not create Bitly links")
+            info.error("Could not create Bitly links")
             ticker_ready.value = 0
         
         finally:
             dt = datetime.datetime
             t = dt.now()+datetime.timedelta(seconds=self.refresh_sec)
-            print("\nWill get more news at %s\n\n") % t.strftime('%m/%d/%y %H:%M:%S')
+            info("Will get more news at %s"), t.strftime('%m/%d/%y %H:%M:%S'))
             ticker_ready.value = 1
             
     def writeImage(self, url, count):
@@ -236,12 +239,12 @@ class rss_feed():
     def fileQueue(self):
         for disp in self.displayItems[:60]:
             news_ticker.value = disp
-            print(news_ticker.value)
+            logger.info(news_ticker.value)
             time.sleep(30)
 
 class pb_main():
     def __init__(self, *args, **kwargs):
-        print('PB Started...')
+        logger.info('PB Started...')
         pb_limit = 20
         pb_interval = 20
         pb_auth_token = 'o.1mYHkPzpFzSXHF4M2UcGhit6zyZQ98tM'
@@ -256,9 +259,10 @@ class pb_main():
             for i in pushes:
                 if count <= loop_len:
                     try:
-                        print(i['title']+' | '+i['url'])
+                        logger.info(i['title']+' | '+i['url'])
                         time.sleep(pb_interval)
-                    except:
+                    except Exception as err:
+                        logger.error('PB Error: %s', err)
                         pass
                     count = count + 1
                 else:
@@ -275,9 +279,10 @@ class tweet_query():
                 projection = { '_id' : 0, 'user.screen_name' : 1, 'text' : 1 ,'created_at' : 1}
                 result = db.twitter_query.find_one(query, projection)
                 self.output = str(result['user']['screen_name'] + ': ' + result['text'] + ': ' + result['created_at']).encode('ascii','ignore')
-                print(self.output)
+                logger.info('Tweet: %s', self.output)
                 curr_tweet.value = self.output
-            except:
+            except Exception as err:
+                logger.error('Tweet Query Error: %s', err)
                 time.sleep(10)
                 tweet_query()
             time.sleep(30)
@@ -288,7 +293,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        print 'Work Started: PID %d' % os.getpid()
+        logger.info('Work Started: PID %d', os.getpid())
         
         jobs = []
         lock = Lock()
@@ -341,11 +346,11 @@ if __name__ == "__main__":
         #JOIN ALL JOBS
         for j in jobs:
             j.join()
-            print(j)
+            logger.info(j)
             
     except KeyboardInterrupt:
         for j in jobs:
             j.terminate()
             time.sleep(2)
-            print(j, j.is_alive())
+            logger.warning(j, j.is_alive())
     
