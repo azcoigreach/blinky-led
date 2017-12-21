@@ -6,8 +6,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-class tweet_update():
+class tweet_query():
     def __init__(self, *args, **kwargs):
+        logger.debug(d)
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
         logger.warning('tweet_query started')
@@ -25,5 +26,4 @@ class tweet_update():
                 tweet_query()
             time.sleep(30)
 
-def tweet_query():
-    logger.debug(d)
+    
