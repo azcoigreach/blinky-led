@@ -3,7 +3,6 @@ from time import strftime
 import time
 import datetime
 import logging
-logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 logger = logger.setLevel(logging.WARNING)
 
