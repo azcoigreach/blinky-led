@@ -273,6 +273,7 @@ class tweet_query():
     def __init__(self, *args, **kwargs):
         client = MongoClient('192.168.1.240', 27017)
         db = client.twitter_stream
+        logger.info('tweet_query started')
         while True:
             try:
                 query = { '$query' : {}, '$orderby' : { '$natural' : -1 } }
