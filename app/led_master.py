@@ -46,7 +46,7 @@ import pprint
 import glob
 __all__ = [os.path.basename(f)[:-3] for f in glob.glob(os.path.dirname(__file__) + "/workers/*.py")]
 
-import workers.led_update
+import led_update
 import workers.tweet_query
 import workers.led_clock
 import workers.countdown_clock
