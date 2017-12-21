@@ -47,7 +47,7 @@ class RunText(BlinkyBase):
             offscreenCanvas.Clear()
             logger.debug(d_time_now)
             self.clock = d_time_now
-            self.count_down = count_down.value
+            self.count_down = d_count_down
             
             #Lines
             graphics.DrawLine(offscreenCanvas, 0, 18, 128, 18, line_a_color)
@@ -55,7 +55,7 @@ class RunText(BlinkyBase):
             
             # Top Twitter Ticker
             if curr_tweet.value != '': 
-                ticker = curr_tweet.value
+                ticker = d_curr_tweet
                 len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
                 self.pos -= 1
                 if (self.pos + len < 0):
@@ -69,7 +69,7 @@ class RunText(BlinkyBase):
             graphics.DrawText(offscreenCanvas, count_label_font, 1, 25, count_label_color, 'NOT MY PRESIDENT!')
             
             # Bottom Right Weather Bug
-            self.temp = str('%sF') % curr_temp.value
+            self.temp = str('%sF') % d_curr_temp
             graphics.DrawText(offscreenCanvas, count_wx_font, 104, 25, count_wx_color, self.temp)
             
             # Refresh Rate    
@@ -78,10 +78,12 @@ class RunText(BlinkyBase):
 
 def led_update(d):
     logger.debug(d)
-    global d_time_now
+    global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
     d_time_now = d['time_now']
-   
-    
-    parser = RunText(d)
+    d_count_down = d['count_down']
+    d_curr_tweet = d['curr_tweet']
+    d_curr_temp = d['curr_temp']
+
+    parser = RunText()
     if (not parser.process()):
         parser.print_help()
