@@ -4,7 +4,7 @@ import time
 import datetime
 import logging
 logger = logging.getLogger(__name__)
-logger = logger.setLevel(logging.WARNING)
+logger.setLevel(logging.WARNING)
 
 class led_clock():
     def __init__(self, *args, **kwargs):

@@ -5,11 +5,11 @@ import os
 from workers import *
 import logging
 logger = logging.getLogger('MASTER')
-logger = logger.setLevel(logging.WARNING)
+logger.setLevel(logging.WARNING)
 
 if __name__ == "__main__":
     try:
-        logger.WARNING('Work Started: PID %d', os.getpid())
+        logger.warning('Work Started: PID %d', os.getpid())
         manager = Manager()
         d = manager.dict()
         d={'time_now': b'88/88/88 88:88', 'count_down': b'8888Days 88H 88M', 'curr_temp':888.8, 'news_ticker':b'0.ppm', 'curr_tweet':b'screen_name: xxxx : ddd mmm DD HH:MM:SS +0000 YYYY'}
