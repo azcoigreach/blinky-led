@@ -88,12 +88,12 @@ class RunText(BlinkyBase):
             graphics.DrawLine(offscreenCanvas, 68, 19, 68, 32, line_a_color)
             
             # Top Twitter Ticker
-                if curr_tweet.value != '': 
-                    ticker = curr_tweet.value
-                    len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
-                    self.pos -= 1
-                    if (self.pos + len < 0):
-                        self.pos = offscreenCanvas.width
+            if curr_tweet.value != '': 
+                ticker = curr_tweet.value
+                len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, ticker)
+                self.pos -= 1
+                if (self.pos + len < 0):
+                    self.pos = offscreenCanvas.width
             
             #Bottom Right Clock
             graphics.DrawText(offscreenCanvas, time_font, 71, 31, time_color, self.clock)
