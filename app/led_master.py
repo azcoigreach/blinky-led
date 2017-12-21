@@ -32,13 +32,13 @@ if __name__ == "__main__":
         manager = Manager()
         
         #Process Variables
-        time_now = manager.Array('c', b'88/88/88 88:88' ,lock=lock) 
-        count_down = manager.Array('c', b'8888Days 88H 88M' ,lock=lock)
+        time_now = manager.Array('c', b'88/88/88 88:88') 
+        count_down = manager.Array('c', b'8888Days 88H 88M')
         curr_temp = manager.Value('d', 888.8)
-        news_ticker = manager.Array('c', b'9999.ppm' ,lock=lock)
+        news_ticker = manager.Array('c', b'9999.ppm')
         news_ticker.value = str('0.ppm')
         ticker_ready = manager.Value('i', 0)
-        curr_tweet = manager.Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY', lock=lock) 
+        curr_tweet = manager.Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY') 
      
 
         apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
