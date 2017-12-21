@@ -49,7 +49,7 @@ hdlr = logging.FileHandler('/var/tmp/led_master.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 
 class RunText(BlinkyBase):
