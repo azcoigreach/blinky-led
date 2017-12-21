@@ -4,6 +4,7 @@ from multiprocessing import Process, Manager
 import os
 from workers import *
 import logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('MASTER')
 logger.setLevel(logging.WARNING)
 

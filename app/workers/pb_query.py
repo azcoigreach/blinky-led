@@ -2,6 +2,7 @@ from multiprocessing import Process, Manager
 from pushbullet import Pushbullet
 from pushbullet import Listener
 import logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
