@@ -1,8 +1,8 @@
 #!/usr/bin/env python 2.7
 import time
 
-from multiprocessing import Process, Lock, Manager, Value, Array
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
+# from multiprocessing.sharedctypes import Value, Array
 
 import feedparser, bitly_api
 import urllib2
@@ -41,14 +41,15 @@ if __name__ == "__main__":
         ticker_ready = manager.Value('i', 0)
         curr_tweet = manager.Array('c', b'screen_name: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx : ddd mmm DD HH:MM:SS +0000 YYYY') 
      
+        d={'time_now': b'88/88/88 88:88', 'count_down': b'8888Days 88H 88M', 'curr_temp':888.8, 'news_ticker':b'0.ppm', 'curr_tweet':b'screen_name: xxxx : ddd mmm DD HH:MM:SS +0000 YYYY'}
 
         apps = [led_update.led_update, tweet_query.tweet_query, led_clock.led_clock, countdown_clock.countdown_clock, weather.weather] 
         processes = {}
         n=0
         for app in apps:
-            instance = app()
+            instance = app(d)
             pprint.pprint(instance)
-            p = Process(target=instance.start_listener, args=(time_now,count_down,curr_temp,news_ticker,curr_tweet,lock))
+            p = Process(target=instance.start_listener, args=(d,))
             p.start()
             processes[n] = (p, app) # Keep the process and the app to monitor or restart
             n += 1
