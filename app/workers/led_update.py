@@ -4,7 +4,7 @@ from rgbmatrix import graphics
 from multiprocessing import Process, Manager
 import pprint
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
@@ -79,7 +79,7 @@ class RunText(BlinkyBase):
 def led_update(d):
     logger.debug(d)
     # global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
-    global d
+    
     d_time_now = d['time_now']
     d_count_down = d['count_down']
     d_curr_tweet = d['curr_tweet']
