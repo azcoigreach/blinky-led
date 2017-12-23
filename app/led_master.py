@@ -18,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 class RunText(BlinkyBase):
     def __init__(self, *args, **kwargs):
         super(RunText, self).__init__(*args, **kwargs)
-        logger.warning('Init LED Loop')
+        logger.warning('Init: BlinkyBase')
 
     def Run(self):
         
@@ -52,7 +52,6 @@ class RunText(BlinkyBase):
         
         while True:
             offscreenCanvas.Clear()
-            logger.debug(d_time_now)
             self.clock = d_time_now
             self.count_down = d_count_down
             
@@ -85,7 +84,7 @@ class RunText(BlinkyBase):
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
 def led_clock():
-    logger.warning('Init Clock')
+    logger.warning('Init: Clock function')
     while True:
         dt = datetime.datetime
         dt_now = dt.now().strftime('%m/%d/%y %H:%M')
@@ -95,19 +94,9 @@ def led_clock():
         time.sleep(10)
 
 def led_update():
-    logger.debug('led_update function')
+    logger.debug('Init: led_update function')
+    led_parser = RunText()
     
-    global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
-
-    d_time_now = d['time_now']
-    d_count_down = d['count_down']
-    d_curr_tweet = d['curr_tweet']
-    d_curr_temp = d['curr_temp']
-
-    parser = RunText()
-    if (not parser.process()):
-        parser.print_help()
-
 
 
 def main():
