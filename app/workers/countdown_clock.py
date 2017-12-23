@@ -1,18 +1,17 @@
-from multiprocessing import Process, Lock, Manager
-from multiprocessing.sharedctypes import Value, Array
+from multiprocessing import Process, Manager
 import time
 import datetime
 import logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
 
-class countdown_clock():
-    def __init__(self, *args, **kwargs):
-        logger.warning('Countdown Clock')
-        logger.debug(d)
-        while True:
-            dt = datetime.datetime
-            count = dt(2021,1,21,9) - dt.now()
-            count_down.value = '%dDays %dH %dM' % (count.days, count.seconds/3600, count.seconds%3600/60)
-            logger.debug('Count Clock: %s', count_down.value)
-            time.sleep(2)
+def countdown_clock():
+    logger.warning('Initiate Countdown Clock')
+    while True:
+        dt = datetime.datetime
+        count = dt(2021,1,21,9) - dt.now()
+        d['count_down'] = '%dDays %dH %dM' % (count.days, count.seconds/3600, count.seconds%3600/60)
+        
+        logger.info('Count Clock: %s', d['count_down'])
+        time.sleep(2)
