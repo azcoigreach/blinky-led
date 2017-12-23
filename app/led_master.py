@@ -2,7 +2,7 @@
 import time
 from time import strftime
 import os
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, Lock, Array, Value
 import pprint
 from blinkybase import BlinkyBase
 from rgbmatrix import graphics
@@ -84,7 +84,7 @@ class RunText(BlinkyBase):
             time.sleep(0.025)
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
 
-def led_clock(d):
+def led_clock():
     logger.warning('Init Clock')
     while True:
         dt = datetime.datetime
@@ -94,7 +94,7 @@ def led_clock(d):
         
         time.sleep(10)
 
-def led_update(d):
+def led_update():
     logger.debug('led_update function')
     
     global d_time_now, d_count_down, d_curr_tweet, d_curr_temp
@@ -110,53 +110,58 @@ def led_update(d):
 
 
 
-
+def main():
+    pass
 
 if __name__ == "__main__":
     try:
-        logger.warning('Work Started: PID %d', os.getpid())
-        manager = Manager()
-        d = manager.dict()
-        d['time_now'] = ''
-        d['count_down'] = ''
-        d['curr_tweet'] = ''
-        d['curr_temp'] = ''
-        logger.debug(d)
-        apps = [led_clock, led_update]# weather.weather, .led_clock, countdown_clock.countdown_clock, tweet_query.tweet_query, led_update.led_update] 
-        processes = {}
-        n=0
-        for app in apps:
-            instance = app(d)
-            p = Process(target=instance, args=(d,), name=app)
-            p.start()
-            # processes[n] = (p, app)
-            logger.warning(p) 
-            n += 1
-            time.sleep(0.25)
-
-        # while len(processes) > 0:
-        #     for n in processes.keys():
-        #         (p, a) = processes[n]
-                
-        #         time.sleep(0.5)
-        #         if p.exitcode is None and not p.is_alive(): # Not finished and not running
-        #             # Do your error handling and restarting here assigning the new process to processes[n]
-        #             # logger.warning('is gone as if never born!',p)
-        #         elif p.exitcode < 0:
-        #             # logger.warning('Process Ended with an error or a terminate', p)
-        #             # Handle this either by restarting or delete the entry so it is removed from list as for else
-        #         else:
-        #             # logger.warning('finished', p)
-        #             p.join() # Allow tidyup
-        #             del processes[n] # Removed finished items from the dictionary 
-        #             # When none are left then loop will end
+        print 'Work Started: PID %d' % os.getpid()
         
+        jobs = []
+        lock = Lock()
+        
+        #Process Variables
+        time_now = Array('c', b'88/88/88 88:88' ,lock=lock) 
+        count_down = Array('c', b'8888Days 88H 88M' ,lock=lock)
+        curr_temp = Value('d', 888.8)
+        news_ticker = Array('c', b'9999.ppm' ,lock=lock)
+        news_ticker.value = str('0.ppm')
+        ticker_ready = Value('i', 0)
+        
+        
+        #Start LED_CLOCK LOOP
+        rt = Process(target=led_clock)
+        jobs.append(rt)
+        rt.start()
+        
+        #Start LED_CLOCK LOOP
+        rt = Process(target=countdown_clock)
+        jobs.append(rt)
+        rt.start()
+        
+        #Start Weather Updater
+        rt = Process(target=weather)
+        jobs.append(rt)
+        rt.start()
+        
+        #Start RSS Feed Updater
+        # rt = Process(target=rss_feed)
+        # jobs.append(rt)
+        # rt.start()
+        
+        #Start LED UPDATE LOOP
+        rt = Process(target=led_update)
+        jobs.append(rt)
+        rt.start()
+        
+        #JOIN ALL JOBS
+        for j in jobs:
+            j.join()
+            print(j)
             
     except KeyboardInterrupt:
-        for n in processes.keys():
-            (p, a) = processes[n]
-            logger.warning('Shutting Down: %s %s', p, p.is_alive())
-            p.terminate()
+        for j in jobs:
+            j.terminate()
             time.sleep(2)
-            
+            print(j, j.is_alive())
     
