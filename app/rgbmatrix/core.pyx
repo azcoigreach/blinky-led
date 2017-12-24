@@ -2,10 +2,24 @@
 
 from libcpp cimport bool
 from libc.stdint cimport uint8_t, uint32_t
+from PIL import Image
 
 cdef class Canvas:
     cdef cppinc.Canvas* __getCanvas(self) except +:
         raise Exception("Not implemented")
+
+    # First implementation of a SetImage(). OPTIMIZE_ME: A more native
+    # implementation that directly reads the buffer and calls the underlying
+    # C functions can certainly be faster.
+    def SetImage(self, image, int offset_x = 0, int offset_y = 0):
+        if (image.mode != "RGB"):
+            raise Exception("Currently, only RGB mode is supported for SetImage(). Please create images with mode 'RGB' or convert first with image = image.convert('RGB'). Pull requests to support more modes natively are also welcome :)")
+        img_width, img_height = image.size
+        pixels = image.load()
+        for x in range(max(0, -offset_x), min(img_width, self.width - offset_x)):
+            for y in range(max(0, -offset_y), min(img_height, self.height - offset_y)):
+                (r, g, b) = pixels[x, y]
+                self.SetPixel(x + offset_x, y + offset_y, r, g, b)
 
 cdef class FrameCanvas(Canvas):
     def __dealloc__(self):
@@ -39,10 +53,14 @@ cdef class FrameCanvas(Canvas):
 
 cdef class RGBMatrix(Canvas):
     def __cinit__(self, int rows, int chains = 1, int parallel = 1):
+        # TODO(Saij): this should initialize an RGBMatrix::Options and
+        # RuntimeOptions, then call CreateMatrixFromOptions() instead of the
+        # cppinc.RGBMatrix() constructor directly. No __gpio needed anymore.
+        # The options allow to set more things, so they should probably be
+        # available as named parameters in Python ?
         self.__gpio = new cppinc.GPIO()
         if not self.__gpio.Init():
-            raise Exception("Error initializing GPIOs")
-
+            raise Exception("Error initializing GPIOs")  # will segfault?!
         self.__matrix = new cppinc.RGBMatrix(self.__gpio, rows, chains, parallel)
 
     def __dealloc__(self):
