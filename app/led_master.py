@@ -11,7 +11,6 @@ import urllib2
 import json
 import os
 import threading
-from PIL import Image, ImageFont, ImageDraw
 import random
 import pickle
 from workers import *
