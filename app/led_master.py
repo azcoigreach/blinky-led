@@ -31,25 +31,25 @@ class RunText(BlinkyBase):
         
         #Format
         time_font = graphics.Font()
-        time_font.LoadFont("/home/pi/led/fonts/4x6.bdf")
+        time_font.LoadFont("./fonts/4x6.bdf")
         time_color = graphics.Color(157, 31, 186)
         
         count_font = graphics.Font()
-        count_font.LoadFont("/home/pi/led/fonts/4x6.bdf")
+        count_font.LoadFont("./fonts/4x6.bdf")
         count_color = graphics.Color(198, 29, 41)
         
         line_a_color = graphics.Color(27, 93, 198)
         
         count_label_font = graphics.Font()
-        count_label_font.LoadFont("/home/pi/led/fonts/4x6.bdf")
+        count_label_font.LoadFont("./fonts/4x6.bdf")
         count_label_color = graphics.Color(198, 29, 41)
         
         count_wx_font = graphics.Font()
-        count_wx_font.LoadFont("/home/pi/led/fonts/4x6.bdf")
+        count_wx_font.LoadFont("./fonts/4x6.bdf")
         count_wx_color = graphics.Color(204, 171, 40)
         
         ticker_font = graphics.Font()
-        ticker_font.LoadFont("/home/pi/led/fonts/8x13.bdf")
+        ticker_font.LoadFont("./fonts/8x13.bdf")
         ticker_color = graphics.Color(99, 127, 115)
         self.pos = offscreenCanvas.width
         
