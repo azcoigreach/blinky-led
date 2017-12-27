@@ -28,9 +28,11 @@ class tweet_query():
                 projection = { '_id' : 0, 'user.screen_name' : 1, 'text' : 1 ,'created_at' : 1}
                 result = db.twitter_query.find_one(query, projection)
                 logger.debug(result)
+
                 printable = set(string.printable)
                 text_filter = filter(lambda x: x in printable, result['text'])
-                output = str(result['user']['screen_name'] + ': ' + text_filter + ': ' + result['created_at']).encode('ascii', errors='ignore')
+                tweet_date = datetime.result['created_at'].strftime('%a %b %d %H:%M:%S +0000 %Y')
+                output = str(result['user']['screen_name'] + ': ' + text_filter + ': ' + tweet_date).encode('ascii', errors='ignore')
                 
                 logger.debug('Twitter String Output: %s', output)
                 twitter = {'curr_tweet': output}
