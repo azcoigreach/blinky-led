@@ -31,10 +31,8 @@ class tweet_query():
 
                 printable = set(string.printable)
                 text_filter = filter(lambda x: x in printable, result['text'])
-                tweet_iso_date = result['created_at']
-                tweet_date = datetime.tweet_iso_date.strftime('%a %b %d %H:%M:%S +0000 %Y')
+                tweet_date = datetime.strftime(result['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
                 output = str(result['user']['screen_name'] + ': ' + text_filter + ': ' + tweet_date).encode('ascii', errors='ignore')
-                
                 logger.debug('Twitter String Output: %s', output)
                 twitter = {'curr_tweet': output}
                 logger.info('Tweet: %s', twitter['curr_tweet'])
