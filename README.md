@@ -1,8 +1,9 @@
 ## Blinky LED
 
-* RUN
+* Usage:
 ```
-python app/led_master.py
+$ pip install --editable .
+$ blinky --help
 ```
 
 * DOCKER

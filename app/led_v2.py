@@ -1,4 +1,5 @@
-#!/usr/bin/env python 2.7
+#!/usr/bin/env python 3.7.3
+# import click
 from time import strftime
 from blinkybase import BlinkyBase
 from rgbmatrix import graphics
@@ -85,10 +86,10 @@ class RunText(BlinkyBase):
             
             # Top Twitter Ticker
         
-            # len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, self.curr_tweet)
-            # self.pos -= 1
-            # if (self.pos + len < 0):
-            #     self.pos = offscreenCanvas.width
+            len = graphics.DrawText(offscreenCanvas, ticker_font, self.pos, 14, ticker_color, self.curr_tweet)
+            self.pos -= 1
+            if (self.pos + len < 0):
+                self.pos = offscreenCanvas.width
             
             time.sleep(0.025)
             offscreenCanvas = self.matrix.SwapOnVSync(offscreenCanvas)
@@ -124,7 +125,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        print 'Work Started: PID %d' % os.getpid()
+        print('Work Started: PID %d') % os.getpid()
         
         jobs = []
         lock = Lock()
@@ -133,12 +134,12 @@ if __name__ == "__main__":
         time_now = Array('c', b'88/88/88 88:88' ,lock=lock) 
         count_down = Array('c', b'8888Days 88H 88M' ,lock=lock)
 
-        #Start TWITTER WORKER
+        # #Start TWITTER WORKER
         # rt = Process(target=twitter.tweet_query)
         # jobs.append(rt)
         # rt.start()
 
-        #Start WEATHER WORKER
+        # #Start WEATHER WORKER
         # rt = Process(target=weather.get_temp)
         # jobs.append(rt)
         # rt.start()
