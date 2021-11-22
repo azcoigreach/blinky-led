@@ -1,11 +1,11 @@
 import os
+if os.geteuid() != 0:
+    exit("You need to have root privileges to run this script.\nPlease try again with 'sudo'. Exiting.")
 import sys
-
 import click
-
+from rgbmatrix import RGBMatrix, RGBMatrixOptions
 
 CONTEXT_SETTINGS = dict(auto_envvar_prefix="BLINKY")
-
 
 class Environment:
     def __init__(self):
@@ -22,6 +22,9 @@ class Environment:
         """Logs a message to stderr only if verbose is enabled."""
         if self.verbose:
             self.log(msg, *args)
+    
+    def matrix(self):
+        pass
 
 
 pass_environment = click.make_pass_decorator(Environment, ensure=True)
@@ -39,7 +42,7 @@ class BlinkyCLI(click.MultiCommand):
 
     def get_command(self, ctx, name):
         try:
-            mod = __import__(f"BlinkyLED.commands.cmd_{name}", None, None, ["cli"])
+            mod = __import__(f"blinky.commands.cmd_{name}", None, None, ["cli"])
         except ImportError:
             return
         return mod.cli
@@ -52,9 +55,56 @@ class BlinkyCLI(click.MultiCommand):
     help="Changes the folder to operate on.",
 )
 @click.option("-v", "--verbose", is_flag=True, help="Enables verbose mode.")
+@click.option(
+    "-r",
+    "--rows",
+    "rows",
+    type=int,
+    default=32,
+    show_default=True,
+    help="RGB Matrix rows"
+)
+@click.option(
+    "-l",
+    "--chain_length",
+    "chain_length",
+    type=int,
+    default=4,
+    show_default=True,
+    help="RGB Matrix chain_length"
+)
+@click.option(
+    "-p",
+    "--parallel",
+    "parallel",
+    type=int,
+    default=1,
+    show_default=True,
+    help="RGB Matrix parallel"
+)
+@click.option(
+    "-h",
+    "--hardware_mapping",
+    "hardware_mapping",
+    type=str,
+    default='adafruit-hat',
+    show_default=True,
+    help="Hardware Mapping - 'regular' or 'adafruit-hat'"
+)
 @pass_environment
-def cli(ctx, verbose, home):
-    """Blinky command line interface."""
+def cli(ctx, verbose, home, rows, chain_length, parallel, hardware_mapping):
+    """Blinky Matrix Display Driver"""
     ctx.verbose = verbose
     if home is not None:
         ctx.home = home
+
+    # Configuration for the matrix
+    options = RGBMatrixOptions()
+    options.rows = rows
+    options.chain_length = chain_length
+    options.parallel = parallel
+    options.hardware_mapping = hardware_mapping
+
+    ctx.matrix = RGBMatrix(options = options)
+    ctx.vlog(click.style("Matrix cli executed", fg="red"))
+    ctx.vlog(click.style(f"home = {ctx.home}", fg="yellow"))
