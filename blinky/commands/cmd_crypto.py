@@ -11,6 +11,7 @@ def binance(ctx, symbol):
         response = requests.get(f'https://api.binance.us/api/v3/ticker/24hr?symbol={symbol}')
         ctx.json_data = response.json()
         ctx.vlog(click.style(ctx.json_data, fg="red"))
+        ctx.vlog(click.style(f"Request(sec): {response.elapsed.total_seconds()}", fg='bright_red', reverse=False))
     except Exception as e :
         err_refesh = 15
         ctx.log(click.style(f'Error: {e}', fg='red'))
@@ -36,7 +37,7 @@ def markPriceRange(ctx,x,y):
     default="BTCUSDT",
     show_default=True,
     help="Crypto Pair ex.'BTCUSDT'"
-)
+    )
 @click.option(
     "-c",
     "--currency",
@@ -44,7 +45,7 @@ def markPriceRange(ctx,x,y):
     type=str,
     default="$",
     help="Currency symbol ex.'$','B' or 'T'"
-)
+    )
 @click.option(
     "-d",
     "--decimals",
@@ -52,7 +53,7 @@ def markPriceRange(ctx,x,y):
     type=int,
     default=2,
     help="Round value for price"
-)
+    )
 @click.option(
     "-r",
     "--refresh",
@@ -61,7 +62,7 @@ def markPriceRange(ctx,x,y):
     default=60,
     show_default=True,
     help="Default refresh rate"
-)
+    )
 @click.command("crypto", short_help="Crypto Price from Binance")
 @pass_environment
 def cli(ctx, symbol, refresh, currency, decimals):
@@ -71,7 +72,7 @@ def cli(ctx, symbol, refresh, currency, decimals):
     ctx.vlog(click.style("Crypto Debug", fg="red"))
 
     while True:
-        image = Image.new("RGB", (128, 32), (0,0,0))  
+        image = Image.new("RGB", (ctx.matrix.width, ctx.matrix.height), (0,0,0))  
         fnt_small = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/4x6.pil")
         fnt_med = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/7x13.pil")
         fnt_big = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/10x20.pil")
