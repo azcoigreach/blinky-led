@@ -18,12 +18,15 @@ def binance(ctx, symbol):
         time.sleep(err_refesh)
 
 @pass_environment
-def markPriceRange(ctx):
-    matrix_width = 126
-    pixel_price = ((float(ctx.json_data['highPrice'])-float(ctx.json_data['lowPrice']))/matrix_width)
-    # ctx.vlog(click.style(f'pixel_price = {pixel_price}', fg='yellow'))
+def markPriceRange(ctx,x,y):
+    range = y-x
+    pixel_price = ((float(ctx.json_data['highPrice'])-float(ctx.json_data['lowPrice']))/range)
     ctx.curr_pixel = int(round(((float(ctx.json_data['lastPrice'])-float(ctx.json_data['lowPrice'])))/pixel_price))
-    ctx.vlog(click.style(f'curr_pixel = {ctx.curr_pixel}', fg='yellow'))
+    if ctx.curr_pixel < x:
+        ctx.curr_pixel = x
+    elif ctx.curr_pixel > y:
+        ctx.curr_pixel = y
+    ctx.vlog(click.style(f'ctx.curr_pixel = {ctx.curr_pixel}', fg='yellow'))
 
 @click.option(
     "-s",
@@ -33,6 +36,22 @@ def markPriceRange(ctx):
     default="BTCUSDT",
     show_default=True,
     help="Crypto Pair ex.'BTCUSDT'"
+)
+@click.option(
+    "-c",
+    "--currency",
+    "currency",
+    type=str,
+    default="$",
+    help="Currency symbol ex.'$','B' or 'T'"
+)
+@click.option(
+    "-d",
+    "--decimals",
+    "decimals",
+    type=int,
+    default=2,
+    help="Round value for price"
 )
 @click.option(
     "-r",
@@ -45,7 +64,7 @@ def markPriceRange(ctx):
 )
 @click.command("crypto", short_help="Crypto Price from Binance")
 @pass_environment
-def cli(ctx, symbol, refresh):
+def cli(ctx, symbol, refresh, currency, decimals):
     """Retrieve 24hr Crpto Price from Binance API
     Output to Matrix"""
     ctx.log(click.style("Running Crypto.", fg="cyan"))
@@ -65,20 +84,18 @@ def cli(ctx, symbol, refresh):
         draw = ImageDraw.Draw(image)
         draw.rectangle((0, 0, 127, 31), fill=(0, 0, 0), outline=(0, 0, 128)) # border
         draw.text((1, -1), ctx.json_data['symbol'], font=fnt_med, fill=color_a)
-        draw.text((1, 15), str(f"${float(ctx.json_data['lastPrice'])}"), font=fnt_big, fill=color_b)
-        draw.text((65, 1), str(f"${float(ctx.json_data['priceChange'])}"), font=fnt_small, fill=color_e)
-        draw.text((65, 7), str(f"{float(ctx.json_data['priceChangePercent'])}%"), font=fnt_small, fill=color_e)
-        markPriceRange()
+        draw.text((1, 15), str(f"{currency}{round(float(ctx.json_data['lastPrice']),decimals)}"), font=fnt_big, fill=color_b) # 
+        draw.text((65, 1), str(f"{currency}{round(float(ctx.json_data['priceChange']),decimals)}"), font=fnt_small, fill=color_e)
+        draw.text((65, 7), str(f"{round(float(ctx.json_data['priceChangePercent']),decimals)}%"), font=fnt_small, fill=color_e)
+        markPriceRange(1,126) # pixel value range x,y
         draw.rectangle((1,14,(ctx.curr_pixel-1),15), fill=color_d) # Low Range
         draw.rectangle(((ctx.curr_pixel+1),14,126,15), fill=color_c) # High range
         draw.rectangle((ctx.curr_pixel,13,ctx.curr_pixel,16), fill=color_b) # Current value
-        # draw.text((1,22), ctx.json_data['highPrice'], font=fnt_small, fill=color_a)
-        # draw.text((20,22), ctx.json_data['lowPrice'], font=fnt_small, fill=color_a)
         ctx.vlog(click.style("Matrix Set", fg="red"))  
         ctx.matrix.SetImage(image)
-        ctx.log(click.style(str(f"{ctx.json_data['symbol']} ${float(ctx.json_data['lastPrice'])}"), fg="yellow"))  
-        ctx.log(click.style(str(f"${float(ctx.json_data['priceChange'])} {float(ctx.json_data['priceChangePercent'])}%"), fg="magenta"))
-        ctx.log(click.style(str(f"High:${float(ctx.json_data['highPrice'])} Low:${float(ctx.json_data['lowPrice'])}%"), fg="cyan"))
+        ctx.log(click.style(str(f"{ctx.json_data['symbol']} {currency}{round(float(ctx.json_data['lastPrice']),decimals)}"), fg="yellow"))  
+        ctx.log(click.style(str(f"{currency}{round(float(ctx.json_data['priceChange']),decimals)} {round(float(ctx.json_data['priceChangePercent']),decimals)}%"), fg="magenta"))
+        ctx.log(click.style(str(f"High:{currency}{round(float(ctx.json_data['highPrice']),decimals)} Low:{currency}{round(float(ctx.json_data['lowPrice']),decimals)}%"), fg="cyan"))
         time.sleep(refresh)
         clear = lambda: os.system('clear')
         clear()  

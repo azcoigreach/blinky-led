@@ -83,13 +83,13 @@ class BlinkyCLI(click.MultiCommand):
     help="RGB Matrix parallel"
 )
 @click.option(
-    "-h",
+    "-hw",
     "--hardware_mapping",
     "hardware_mapping",
     type=str,
-    default='adafruit-hat',
+    default='adafruit-hat-pwm',
     show_default=True,
-    help="Hardware Mapping - 'regular' or 'adafruit-hat'"
+    help="Hardware Mapping - 'regular' , 'adafruit-hat' or 'adafruit-hat-pwm'"
 )
 @pass_environment
 def cli(ctx, verbose, home, rows, chain_length, parallel, hardware_mapping):
