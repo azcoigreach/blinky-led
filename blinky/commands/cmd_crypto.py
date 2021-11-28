@@ -70,33 +70,45 @@ def cli(ctx, symbol, refresh, currency, decimals):
     Output to Matrix"""
     ctx.log(click.style("Running Crypto.", fg="cyan"))
     ctx.vlog(click.style("Crypto Debug", fg="red"))
-
+    fonts_dir = "/home/pi/BlinkyLED/blinky/media/fonts"
     while True:
         image = Image.new("RGB", (ctx.matrix.width, ctx.matrix.height), (0,0,0))  
-        fnt_small = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/4x6.pil")
-        fnt_med = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/7x13.pil")
-        fnt_big = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/10x20.pil")
+        fnt_small = ImageFont.load(f"{fonts_dir}/4x6.pil")
+        fnt_med = ImageFont.load(f"{fonts_dir}/7x13.pil")
+        fnt_big = ImageFont.load(f"{fonts_dir}/8x13.pil")
         color_a = (194, 112, 29) # orange
         color_b = (29, 167, 194) # cyan
         color_c = (145, 29, 23) # red
         color_d = (25, 145, 23) # green
         color_e = (142, 35, 161) # purple
+        color_f = (212, 212, 32) # yellow
         binance(symbol)     
         draw = ImageDraw.Draw(image)
         draw.rectangle((0, 0, 127, 31), fill=(0, 0, 0), outline=(0, 0, 128)) # border
-        draw.text((1, -1), ctx.json_data['symbol'], font=fnt_med, fill=color_a)
-        draw.text((1, 15), str(f"{currency}{round(float(ctx.json_data['lastPrice']),decimals)}"), font=fnt_big, fill=color_b) # 
-        draw.text((65, 1), str(f"{currency}{round(float(ctx.json_data['priceChange']),decimals)}"), font=fnt_small, fill=color_e)
-        draw.text((65, 7), str(f"{round(float(ctx.json_data['priceChangePercent']),decimals)}%"), font=fnt_small, fill=color_e)
+        draw.text((1, -1), ctx.json_data['symbol'], font=fnt_med, fill=color_a) # symbol
+        # center lastPrice
+        lastPrice = str(f"{currency}{round(float(ctx.json_data['lastPrice']),decimals)}")
+        lastPrice_w, lastPrice_h = draw.textsize(lastPrice, font=fnt_big)
+        draw.text(((ctx.matrix.width-lastPrice_w)/2, 19), lastPrice, font=fnt_big, fill=color_b)
+        # priceChange
+        draw.text((65, 1), str(f"{currency}{round(float(ctx.json_data['priceChange']),decimals)}"), font=fnt_small, fill=color_e) # priceChange
+        draw.text((65, 7), str(f"{round(float(ctx.json_data['priceChangePercent']),decimals)}%"), font=fnt_small, fill=color_e) # priceChangePercent
+        # markPriceRange
         markPriceRange(1,126) # pixel value range x,y
-        draw.rectangle((1,14,(ctx.curr_pixel-1),15), fill=color_d) # Low Range
-        draw.rectangle(((ctx.curr_pixel+1),14,126,15), fill=color_c) # High range
-        draw.rectangle((ctx.curr_pixel,13,ctx.curr_pixel,16), fill=color_b) # Current value
-        ctx.vlog(click.style("Matrix Set", fg="red"))  
+        draw.rectangle((1,18,(ctx.curr_pixel),19), fill=color_d) # draw low markPriceRange
+        draw.rectangle(((ctx.curr_pixel),18,126,19), fill=color_c) # draw high markPriceRange
+        draw.rectangle((ctx.curr_pixel,17,ctx.curr_pixel,20), fill=color_b) # draw current markPriceRange
+        # high low values
+        draw.text((1, 12), str(f"L:{currency}{round(float(ctx.json_data['lowPrice']),decimals)}"), font=fnt_small, fill=color_f)
+        highPrice = str(f"H:{currency}{round(float(ctx.json_data['highPrice']),decimals)}")
+        highPrice_w, highPrice_h = draw.textsize(highPrice, font=fnt_small)
+        draw.text(((ctx.matrix.width-highPrice_w), 12), highPrice, font=fnt_small, fill=color_f)
+        # set image
         ctx.matrix.SetImage(image)
+        # log display
         ctx.log(click.style(str(f"{ctx.json_data['symbol']} {currency}{round(float(ctx.json_data['lastPrice']),decimals)}"), fg="yellow"))  
         ctx.log(click.style(str(f"{currency}{round(float(ctx.json_data['priceChange']),decimals)} {round(float(ctx.json_data['priceChangePercent']),decimals)}%"), fg="magenta"))
-        ctx.log(click.style(str(f"High:{currency}{round(float(ctx.json_data['highPrice']),decimals)} Low:{currency}{round(float(ctx.json_data['lowPrice']),decimals)}%"), fg="cyan"))
+        ctx.log(click.style(str(f"Low:{currency}{round(float(ctx.json_data['lowPrice']),decimals)} High:{currency}{round(float(ctx.json_data['highPrice']),decimals)}"), fg="cyan"))
         time.sleep(refresh)
         clear = lambda: os.system('clear')
         clear()  

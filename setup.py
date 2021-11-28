@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="blinky",
-    version="1.1",
+    version="2.1",
     packages=["blinky", "blinky.commands"],
     include_package_data=True,
     install_requires=["click"],
