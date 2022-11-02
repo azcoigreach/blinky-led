@@ -23,9 +23,9 @@ def cli(ctx):
 
     while True:
         image = Image.new("RGB", (128, 32), (0,0,0))  
-        fnt_small = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/4x6.pil")
-        fnt_med = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/9x15.pil")
-        fnt_big = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/10x20.pil")
+        fnt_small = ImageFont.load(f"/home/pi/BlinkyLED/blinky/media/fonts/4x6.pil")
+        fnt_med = ImageFont.load(f"/home/pi/BlinkyLED/blinky/media/fonts/9x15.pil")
+        fnt_big = ImageFont.load(f"/home/pi/BlinkyLED/blinky/media/fonts/10x20.pil")
         color_a = (194, 112, 29) # orange
         color_b = (29, 167, 194) # cyan
         color_c = (194, 29, 29) # red

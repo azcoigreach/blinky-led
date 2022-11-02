@@ -1,3 +1,0 @@
-# Old Blinky Files
-
-Things in here don't work...

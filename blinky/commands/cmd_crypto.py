@@ -5,9 +5,11 @@ from PIL import Image, ImageDraw, ImageFont
 import time
 import requests
 
+
 @pass_environment
 def binance(ctx, symbol):
     try:
+        ctx.vlog(click.style(f"Connecting to Binance", fg="bright_red"))
         response = requests.get(f'https://api.binance.us/api/v3/ticker/24hr?symbol={symbol}')
         ctx.json_data = response.json()
         ctx.vlog(click.style(ctx.json_data, fg="red"))
@@ -28,6 +30,17 @@ def markPriceRange(ctx,x,y):
     elif ctx.curr_pixel > y:
         ctx.curr_pixel = y
     ctx.vlog(click.style(f'ctx.curr_pixel = {ctx.curr_pixel}', fg='yellow'))
+
+'''
+Create a click.progress bar to count down the refresh timer
+'''
+@pass_environment
+def refreshTimer(ctx, refresh):
+    # make progress bar cyan
+    with click.progressbar(length=refresh, label='Refreshing in:', fill_char=click.style('#', fg='cyan')) as bar:
+        for i in range(refresh):
+            bar.update(1)
+            time.sleep(1)
 
 @click.option(
     "-s",
@@ -109,7 +122,8 @@ def cli(ctx, symbol, refresh, currency, decimals):
         ctx.log(click.style(str(f"{ctx.json_data['symbol']} {currency}{round(float(ctx.json_data['lastPrice']),decimals)}"), fg="yellow"))  
         ctx.log(click.style(str(f"{currency}{round(float(ctx.json_data['priceChange']),decimals)} {round(float(ctx.json_data['priceChangePercent']),decimals)}%"), fg="magenta"))
         ctx.log(click.style(str(f"Low:{currency}{round(float(ctx.json_data['lowPrice']),decimals)} High:{currency}{round(float(ctx.json_data['highPrice']),decimals)}"), fg="cyan"))
-        time.sleep(refresh)
-        clear = lambda: os.system('clear')
-        clear()  
+        # refresh timer
+        refreshTimer(refresh)
+        # clear = lambda: os.system('clear')
+        click.clear()  
 
