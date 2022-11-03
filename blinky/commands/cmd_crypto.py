@@ -5,7 +5,9 @@ from PIL import Image, ImageDraw, ImageFont
 import time
 import requests
 
-
+'''
+retrieve data from binance api
+'''
 @pass_environment
 def binance(ctx, symbol):
     try:
@@ -20,6 +22,9 @@ def binance(ctx, symbol):
         ctx.log(click.style(f'Trying again in {err_refesh}s', fg='yellow'))
         time.sleep(err_refesh)
 
+'''
+determine price range
+'''
 @pass_environment
 def markPriceRange(ctx,x,y):
     range = y-x
@@ -32,7 +37,7 @@ def markPriceRange(ctx,x,y):
     ctx.vlog(click.style(f'ctx.curr_pixel = {ctx.curr_pixel}', fg='yellow'))
 
 '''
-Create a click.progress bar to count down the refresh timer
+click.progress bar to count down the refresh timer
 '''
 @pass_environment
 def refreshTimer(ctx, refresh):

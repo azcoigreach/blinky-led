@@ -1,9 +1,13 @@
 import os
 if os.geteuid() != 0:
     exit("You need to have root privileges to run this script.\nPlease try again with 'sudo'. Exiting.")
+
+from .config import matrix
+
 import sys
 import click
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
+
 
 CONTEXT_SETTINGS = dict(auto_envvar_prefix="BLINKY")
 
@@ -63,7 +67,7 @@ class BlinkyCLI(click.MultiCommand):
     "--rows",
     "rows",
     type=int,
-    default=32,
+    default=matrix.rows,
     show_default=True,
     help="RGB Matrix rows"
     )
@@ -72,7 +76,7 @@ class BlinkyCLI(click.MultiCommand):
     "--chain_length",
     "chain_length",
     type=int,
-    default=4,
+    default=matrix.chain_length,
     show_default=True,
     help="RGB Matrix chain_length"
     )
@@ -81,7 +85,7 @@ class BlinkyCLI(click.MultiCommand):
     "--parallel",
     "parallel",
     type=int,
-    default=1,
+    default=matrix.parallel,
     show_default=True,
     help="RGB Matrix parallel"
     )
@@ -90,7 +94,7 @@ class BlinkyCLI(click.MultiCommand):
     "--brightness",
     "brightness",
     type=int,
-    default=100,
+    default=matrix.brightness,
     show_default=True,
     help="Brightness level. Range: 1..100"
     )
@@ -99,7 +103,7 @@ class BlinkyCLI(click.MultiCommand):
     "--gpio_slowdown",
     "gpio_slowdown",
     type=int,
-    default=1,
+    default=matrix.gpio_slowdown,
     show_default=True,
     help="Slow down writing to GPIO. Range: 0..4"
     )
@@ -107,7 +111,7 @@ class BlinkyCLI(click.MultiCommand):
     "--pwm_lsb_nanoseconds",
     "pwm_lsb_nanoseconds",
     type=int,
-    default=130,
+    default=matrix.led_pwm_lsb_nanoseconds,
     show_default=True,
     help="Base time-unit for the on-time in the lowest significant bit in nanoseconds. Range 50..3000"
     )
@@ -115,7 +119,7 @@ class BlinkyCLI(click.MultiCommand):
     "--scan_mode",
     "scan_mode",
     type=int,
-    default=0,
+    default=matrix.scan_mode,
     show_default=True,
     help="Progressive or interlaced scan. 0 Progressive, 1 Interlaced"
     )
@@ -123,7 +127,7 @@ class BlinkyCLI(click.MultiCommand):
     "--hardware_mapping",
     "hardware_mapping",
     type=str,
-    default='adafruit-hat-pwm',
+    default=matrix.hardware_mapping,
     show_default=True,
     help="Hardware Mapping - 'regular' , 'adafruit-hat' or 'adafruit-hat-pwm'"
     )

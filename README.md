@@ -8,3 +8,8 @@ Matrix Driver - https://github.com/hzeller/rpi-rgb-led-matrix
 $ pip3 install --editable .
 $ blinky --help
 ```
+# TODO
+
+- [ ] Dockerize with GPIO (https://stackoverflow.com/questions/30059784/docker-access-to-raspberry-pi-gpio-pins)
+- [ ] Convert to API and integrate a web interface
+- [ ] Create JSON script to define sequences
