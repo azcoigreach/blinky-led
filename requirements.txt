@@ -3,4 +3,6 @@ requests
 pydantic
 pillow
 python-dotenv
-# -e git+https://github.com/azcoigreach/rpi-rgb-led-matrix/tree/master/bindings/python
+asyncio
+aiohttp
+# git+https://github.com/azcoigreach/rpi-rgb-led-matrix.git

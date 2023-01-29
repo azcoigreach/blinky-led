@@ -5,7 +5,6 @@ from pydantic import BaseSettings
 def get_home_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     
-'''make all core bindings from https://github.com/azcoigreach/rpi-rgb-led-matrix/blob/master/bindings/python/rgbmatrix/core.pyx in variables'''
 class Matrix(BaseSettings):
     rows: int = 32
     cols: int = 32
@@ -30,18 +29,9 @@ class Matrix(BaseSettings):
     daemon: int = 0
     drop_privileges: int = 0
 
-
-
-
     class Config:
-        # .env is in the root directory of the project. get path from the click context
         env_file = os.path.join(get_home_dir(), ".env")
-        print(env_file)
-        # env_file = ".env"
-        # prefix of the environment variables, in this case it will be
-        # `MATRIX_ROWS` instead of `rows`
         env_file_encoding = "utf-8"
         env_prefix = "MATRIX_"
-        # env_file = ".env"
 
 matrix = Matrix()

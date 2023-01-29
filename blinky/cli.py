@@ -7,7 +7,8 @@ from .config import matrix
 import sys
 import click
 from rgbmatrix import RGBMatrix, RGBMatrixOptions
-
+import functools
+import asyncio
 
 CONTEXT_SETTINGS = dict(auto_envvar_prefix="BLINKY")
 
@@ -30,9 +31,17 @@ class Environment:
     def matrix(self):
         pass
 
+    
 
 pass_environment = click.make_pass_decorator(Environment, ensure=True)
 cmd_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "commands"))
+
+def make_sync(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(func(*args, **kwargs))
+        return wrapper
 
 
 class BlinkyCLI(click.MultiCommand):
@@ -227,7 +236,8 @@ class BlinkyCLI(click.MultiCommand):
     help="Drop privileges from 'root' after initializing the hardware. 1=drop, 0=don't drop"
     )
 @pass_environment
-def cli(ctx,
+@make_sync
+async def cli(ctx,
         verbose, 
         home, 
         rows, 
@@ -274,6 +284,27 @@ def cli(ctx,
     ctx.vlog(click.style(f"scan_mode = {options.scan_mode}", fg="yellow"))
     options.hardware_mapping = hardware_mapping
     ctx.vlog(click.style(f"hardware_mapping = {options.hardware_mapping}", fg="yellow"))
-    
-    ctx.matrix = RGBMatrix(options = options)
+    options.show_refresh_rate = show_refresh_rate
+    ctx.vlog(click.style(f"show_refresh_rate = {options.show_refresh_rate}", fg="yellow"))
+    options.inverse_colors = inverse_colors
+    ctx.vlog(click.style(f"inverse_colors = {options.inverse_colors}", fg="yellow"))
+    options.multiplexing = multiplexing
+    ctx.vlog(click.style(f"multiplexing = {options.multiplexing}", fg="yellow"))
+    options.row_address_type = row_address_type
+    ctx.vlog(click.style(f"row_address_type = {options.row_address_type}", fg="yellow"))
+    options.disable_hardware_pulsing = disable_hardware_pulsing
+    ctx.vlog(click.style(f"disable_hardware_pulsing = {options.disable_hardware_pulsing}", fg="yellow"))
+    options.led_rgb_sequence = led_rgb_sequence
+    ctx.vlog(click.style(f"led_rgb_sequence = {options.led_rgb_sequence}", fg="yellow"))
+    options.pixel_mapper_config = pixel_mapper_config
+    ctx.vlog(click.style(f"pixel_mapper_config = {options.pixel_mapper_config}", fg="yellow"))
+    options.panel_type = panel_type
+    ctx.vlog(click.style(f"panel_type = {options.panel_type}", fg="yellow"))
+    options.limit_refresh_rate_hz = limit_refresh_rate_hz
+    ctx.vlog(click.style(f"limit_refresh_rate_hz = {options.limit_refresh_rate_hz}", fg="yellow"))
+    options.daemon = daemon
+    ctx.vlog(click.style(f"daemon = {options.daemon}", fg="yellow"))
+    options.drop_privileges = drop_privileges
+    ctx.vlog(click.style(f"drop_privileges = {options.drop_privileges}", fg="yellow"))
     ctx.vlog(click.style(f"home = {ctx.home}", fg="yellow"))
+    ctx.matrix = RGBMatrix(options = options)

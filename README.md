@@ -1,7 +1,7 @@
-## Blinky LED v2 [WIP]
+## Blinky LED v3 [WIP]
 
 * Requires:
-Matrix Driver - https://github.com/hzeller/rpi-rgb-led-matrix
+Matrix Driver - https://github.com/azcoigreach/rpi-rgb-led-matrix.git
 
 * Usage:
 ```
