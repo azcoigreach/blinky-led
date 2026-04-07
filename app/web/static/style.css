@@ -1,0 +1,65 @@
+:root {
+  --bg: #0f161f;
+  --card: #15212d;
+  --ink: #ecf6ff;
+  --accent: #38d5a3;
+  --muted: #86a8c4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top right, #25374b, var(--bg));
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  padding: 16px;
+}
+
+.panel {
+  background: linear-gradient(180deg, #1b2a38, var(--card));
+  border: 1px solid #2f465d;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+h1, h2 {
+  margin-top: 0;
+}
+
+p, li, label {
+  color: var(--muted);
+}
+
+input, button {
+  width: 100%;
+  margin: 4px 0 10px;
+  border-radius: 6px;
+  border: 1px solid #2f465d;
+  background: #0f171f;
+  color: var(--ink);
+  padding: 8px;
+}
+
+button {
+  background: linear-gradient(90deg, #23779a, var(--accent));
+  border: none;
+  color: #092028;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#preview {
+  width: 100%;
+  image-rendering: pixelated;
+  border: 1px solid #2f465d;
+  background: #05080d;
+}

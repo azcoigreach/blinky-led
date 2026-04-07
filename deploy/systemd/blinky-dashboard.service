@@ -1,0 +1,17 @@
+[Unit]
+Description=Blinky LED Dashboard v3
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/blinky-led
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/pi/blinky-led/.venv/bin/blinky serve --config /home/pi/blinky-led/config.yaml --host 0.0.0.0 --port 8080
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

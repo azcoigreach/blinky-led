@@ -1,18 +1,25 @@
-from blinky.cli import pass_environment
-import os
-import click
-from PIL import Image, ImageDraw, ImageFont
+from pathlib import Path
 import time
 import datetime
 
-@pass_environment
-def clock(ctx):
-    dt = datetime.datetime
-    t = dt.now()
-    ctx.date_now = t.strftime('%m/%d/%y')
-    ctx.time_now = t.strftime('%H:%M:%S')
-    ctx.log(ctx.date_now)
-    ctx.log(ctx.time_now)
+import click
+from PIL import Image, ImageDraw, ImageFont
+
+from blinky.cli import pass_environment
+
+
+def _get_font_paths():
+    fonts_dir = Path(__file__).resolve().parent.parent / "media" / "fonts"
+    return (
+        fonts_dir / "4x6.pil",
+        fonts_dir / "9x15.pil",
+    )
+
+
+def _update_clock_fields(ctx):
+    now = datetime.datetime.now()
+    ctx.date_now = now.strftime("%m/%d/%y")
+    ctx.time_now = now.strftime("%H:%M:%S")
 
 @click.command("clock", short_help="Matrix Clock")
 @pass_environment
@@ -20,26 +27,26 @@ def cli(ctx):
     """Matrix Clock"""
     ctx.log(click.style("Running Clock.", fg="cyan"))
     ctx.vlog(click.style("Clock Debug", fg="red"))
+    fnt_small_path, fnt_med_path = _get_font_paths()
+    fnt_small = ImageFont.load(str(fnt_small_path))
+    fnt_med = ImageFont.load(str(fnt_med_path))
 
     while True:
-        image = Image.new("RGB", (128, 32), (0,0,0))  
-        fnt_small = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/4x6.pil")
-        fnt_med = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/9x15.pil")
-        fnt_big = ImageFont.load(f"/home/pi/BlinkyLED/blinky/fonts/10x20.pil")
+        image = Image.new("RGB", (ctx.matrix.width, ctx.matrix.height), (0, 0, 0))
         color_a = (194, 112, 29) # orange
         color_b = (29, 167, 194) # cyan
         color_c = (194, 29, 29) # red
         color_d = (29, 194, 45) # green
         color_e = (142, 35, 161) # purple
 
-        clock()      
+        _update_clock_fields(ctx)
         draw = ImageDraw.Draw(image)
-        draw.rectangle((0, 0, 127, 31), fill=(0, 0, 0), outline=(0, 0, 128)) # border
+        draw.rectangle((0, 0, ctx.matrix.width - 1, ctx.matrix.height - 1), fill=(0, 0, 0), outline=(0, 0, 128)) # border
+        # Date at top (9x15 font = 15px tall, fits at Y=1)
         draw.text((2, 1), str(ctx.date_now), font=fnt_med, fill=color_b)
-        draw.text((45, 13), str(ctx.time_now), font=fnt_big, fill=color_e)
+        # Time in middle, using smaller font to fit (10x20 won't fit, so use 9x15)
+        draw.text((2, 16), str(ctx.time_now), font=fnt_med, fill=color_e)
         ctx.vlog(click.style("Matrix Set", fg="red"))  
         ctx.matrix.SetImage(image)
-        time.sleep(1)
-        clear = lambda: os.system('clear')
-        clear()  
+        time.sleep(1)  
 

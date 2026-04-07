@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Blinky LED v3</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="grid">
+    <section class="panel">
+      <h1>Blinky v3 Control</h1>
+      <p>Mode: <strong>{{ status.mode }}</strong></p>
+      <p>Current page: <strong>{{ status.current_page_id }}</strong></p>
+      <p>Pinned page: <strong>{{ status.pinned_page_id or 'none' }}</strong></p>
+      <p>Brightness: <strong>{{ status.brightness }}</strong></p>
+      <form id="override-form">
+        <label for="message">Alert/Override Message</label>
+        <input id="message" name="message" maxlength="80" placeholder="Type urgent message" />
+        <button type="submit">Set Override</button>
+      </form>
+      <form id="brightness-form">
+        <label for="brightness">Brightness</label>
+        <input id="brightness" name="brightness" type="number" min="1" max="100" value="{{ status.brightness }}" />
+        <button type="submit">Apply</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Preview</h2>
+      <img id="preview" src="/api/preview" alt="panel preview" />
+      <button id="refresh">Refresh Preview</button>
+    </section>
+
+    <section class="panel">
+      <h2>Widgets</h2>
+      <ul>
+        {% for widget in widgets %}
+        <li>{{ widget }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>Pages</h2>
+      <ul>
+        {% for page in pages %}
+        <li>{{ page.page_id }} ({{ page.layout }})</li>
+        {% endfor %}
+      </ul>
+    </section>
+  </main>
+<script>
+const preview = document.getElementById('preview');
+const refreshBtn = document.getElementById('refresh');
+const overrideForm = document.getElementById('override-form');
+const brightnessForm = document.getElementById('brightness-form');
+
+refreshBtn.addEventListener('click', () => {
+  preview.src = '/api/preview?t=' + Date.now();
+});
+
+overrideForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const message = document.getElementById('message').value;
+  await fetch('/api/override', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({message: message || null}),
+  });
+  preview.src = '/api/preview?t=' + Date.now();
+});
+
+brightnessForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const brightness = Number(document.getElementById('brightness').value || 60);
+  await fetch('/api/brightness', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({brightness}),
+  });
+});
+</script>
+</body>
+</html>

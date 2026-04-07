@@ -1,0 +1,1 @@
+"""Widget plugin implementations."""
