@@ -5,7 +5,7 @@
 v3 no longer treats `rpi-rgb-led-matrix` as the primary backend.
 The mainline hardware implementation is Raspberry Pi 5 + Adafruit Piomatter.
 
-Legacy v2 command modules under `blinky/` remain in the repository for reference but are not the v3 runtime path.
+The legacy `blinky/` runtime has been retired and removed from active packaging.
 
 ## New runtime model
 
@@ -20,8 +20,8 @@ Legacy v2 command modules under `blinky/` remain in the repository for reference
 
 ## New entrypoint
 
-- v2 default command behavior: old `blinky.commands.*`.
-- v3 entrypoint: `blinky` -> `app.cli:cli`.
+- v2 default command behavior: old `blinky.commands.*` (retired).
+- v3 entrypoint: `blinky` -> `app.cli:cli` (only supported entrypoint).
 
 Examples:
 
@@ -32,3 +32,7 @@ Examples:
 
 - `renderer.mode: piomatter` for Pi 5 hardware.
 - `renderer.mode: simulator` for local development and CI.
+
+## Archival note
+
+Legacy runtime modules were removed to avoid a split architecture. See `docs/archive/LEGACY_RETIREMENT.md`.

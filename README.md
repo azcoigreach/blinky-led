@@ -1,4 +1,4 @@
-# Blinky LED v3.0.0
+# Blinky LED v3.0.1
 
 Blinky v3 is a modular LED information dashboard platform for 128x32 HUB75 panels.
 
@@ -8,7 +8,7 @@ Primary target:
 - Adafruit Piomatter backend (`adafruit-blinka-raspberry-pi5-piomatter`)
 - Python 3.13+
 
-`rpi-rgb-led-matrix` is no longer the main architecture in v3.
+The legacy `blinky/` command runtime has been retired. The only supported runtime is `app/` (v3 dashboard).
 
 ## Features
 
@@ -43,6 +43,15 @@ app/
   pages/      # page definition and rotation control
 ```
 
+## Packaging And Entrypoint
+
+- Distribution package: `blinky-led`
+- Python runtime package: `app`
+- Console entrypoint: `blinky` -> `app.cli:cli`
+- Build metadata source of truth: `pyproject.toml`
+
+No legacy `blinky.commands.*` runtime path is supported.
+
 ## Quick start (simulator)
 
 ```bash
@@ -72,6 +81,22 @@ Set `renderer.mode: piomatter` in `config.yaml`, then run:
 sudo .venv/bin/blinky serve --config config.yaml --host 0.0.0.0 --port 8080
 ```
 
+## Run On Reboot (Pi 5)
+
+Install and enable the systemd service:
+
+```bash
+chmod +x deploy/systemd/install-service.sh
+./deploy/systemd/install-service.sh
+```
+
+Check service state:
+
+```bash
+sudo systemctl status blinky-dashboard.service
+sudo journalctl -u blinky-dashboard.service -f
+```
+
 ## REST API
 
 - `GET /api/status`
@@ -90,4 +115,5 @@ sudo .venv/bin/blinky serve --config config.yaml --host 0.0.0.0 --port 8080
 - Simulator developer guide: `docs/DEVELOPMENT_SIMULATOR.md`
 - Pi 5 deployment guide: `docs/DEPLOY_PI5_PIOMATTER.md`
 - Migration notes: `docs/MIGRATION_V3.md`
+- Archive notes: `docs/archive/LEGACY_RETIREMENT.md`
 - Changelog: `CHANGELOG.md`

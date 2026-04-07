@@ -5,6 +5,7 @@
 - Raspberry Pi 5
 - Adafruit Matrix Bonnet/HAT for Pi 5 (Piomatter stack)
 - Python 3.13+
+- v3 dashboard runtime (`app/`) only
 
 ## Install
 
@@ -35,4 +36,25 @@ Root privileges are typically required for GPIO access.
 
 ## systemd unit
 
-Use [deploy/systemd/blinky-dashboard.service](../deploy/systemd/blinky-dashboard.service) as a base and adjust user/group/paths.
+The checked-in unit file is an example only. For a real Pi install, use the installer script so the service points at the current checkout and is enabled on boot.
+
+```bash
+chmod +x deploy/systemd/install-service.sh
+./deploy/systemd/install-service.sh
+```
+
+That will:
+
+- install `/etc/systemd/system/blinky-dashboard.service`
+- run `systemctl daemon-reload`
+- enable the service for reboot startup
+- start it immediately
+
+Useful commands:
+
+```bash
+sudo systemctl status blinky-dashboard.service
+sudo journalctl -u blinky-dashboard.service -f
+sudo systemctl restart blinky-dashboard.service
+sudo systemctl disable --now blinky-dashboard.service
+```
