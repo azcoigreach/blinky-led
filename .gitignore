@@ -238,6 +238,29 @@ UpgradeLog*.htm
 FakesAssemblies/
 
 # GhostDoc plugin setting file
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local runtime artifacts
+.simulator/
+.env
+config.yaml
+
+# Local vendor/cache folders
+.vendor/
+
+# Coverage and editor noise
+.coverage
+htmlcov/
+.DS_Store
 *.GhostDoc.xml
 
 # Node.js Tools for Visual Studio
