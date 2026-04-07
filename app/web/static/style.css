@@ -4,6 +4,8 @@
   --ink: #ecf6ff;
   --accent: #38d5a3;
   --muted: #86a8c4;
+  --warn: #f0b44b;
+  --error: #f56c6c;
 }
 
 * {
@@ -29,6 +31,21 @@ body {
   border: 1px solid #2f465d;
   border-radius: 10px;
   padding: 14px;
+}
+
+.status-block p {
+  margin: 6px 0;
+}
+
+.control-row {
+  margin-bottom: 10px;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 h1, h2 {
@@ -57,9 +74,85 @@ button {
   cursor: pointer;
 }
 
+button.secondary {
+  background: linear-gradient(90deg, #5e6b77, #8ea1b5);
+  color: #12202f;
+}
+
+select {
+  width: 100%;
+  margin: 4px 0 10px;
+  border-radius: 6px;
+  border: 1px solid #2f465d;
+  background: #0f171f;
+  color: var(--ink);
+  padding: 8px;
+}
+
 #preview {
   width: 100%;
   image-rendering: pixelated;
   border: 1px solid #2f465d;
   background: #05080d;
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+#widget-health-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+#widget-health-table th,
+#widget-health-table td {
+  border-bottom: 1px solid #294056;
+  padding: 6px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.badge {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge.ok {
+  background: rgba(56, 213, 163, 0.2);
+  color: var(--accent);
+}
+
+.badge.warn {
+  background: rgba(240, 180, 75, 0.2);
+  color: var(--warn);
+}
+
+.badge.error {
+  background: rgba(245, 108, 108, 0.2);
+  color: var(--error);
+}
+
+#pages-list li {
+  margin-bottom: 4px;
+}
+
+#pages-list li.active-page {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+#pages-list li.pinned-page {
+  color: var(--warn);
+}
+
+@media (max-width: 720px) {
+  .button-row {
+    grid-template-columns: 1fr;
+  }
 }

@@ -10,10 +10,26 @@
   <main class="grid">
     <section class="panel">
       <h1>Blinky v3 Control</h1>
-      <p>Mode: <strong>{{ status.mode }}</strong></p>
-      <p>Current page: <strong>{{ status.current_page_id }}</strong></p>
-      <p>Pinned page: <strong>{{ status.pinned_page_id or 'none' }}</strong></p>
-      <p>Brightness: <strong>{{ status.brightness }}</strong></p>
+      <div class="status-block">
+        <p>Mode: <strong id="mode">{{ status.mode }}</strong></p>
+        <p>Current page: <strong id="current-page">{{ status.current_page_id or 'none' }}</strong></p>
+        <p>Pinned page: <strong id="pinned-page">{{ status.pinned_page_id or 'none' }}</strong></p>
+        <p>Brightness: <strong id="brightness-value">{{ status.brightness }}</strong></p>
+      </div>
+
+      <div class="control-row">
+        <label for="pin-page-select">Pin page</label>
+        <select id="pin-page-select" name="pin-page-select">
+          {% for page in pages %}
+          <option value="{{ page.page_id }}">{{ page.page_id }} - {{ page.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="button-row">
+        <button id="pin-selected" type="button">Pin Selected Page</button>
+        <button id="unpin-current" type="button" class="secondary">Unpin Current</button>
+      </div>
+
       <form id="override-form">
         <label for="message">Alert/Override Message</label>
         <input id="message" name="message" maxlength="80" placeholder="Type urgent message" />
@@ -30,34 +46,177 @@
       <h2>Preview</h2>
       <img id="preview" src="/api/preview" alt="panel preview" />
       <button id="refresh">Refresh Preview</button>
+      <p class="small" id="last-updated">Last updated: never</p>
     </section>
 
     <section class="panel">
-      <h2>Widgets</h2>
-      <ul>
-        {% for widget in widgets %}
-        <li>{{ widget }}</li>
-        {% endfor %}
-      </ul>
+      <h2>Widget Health</h2>
+      <table id="widget-health-table">
+        <thead>
+          <tr>
+            <th>Widget</th>
+            <th>Health</th>
+            <th>Freshness</th>
+            <th>Source</th>
+            <th>Last Success</th>
+            <th>Last Failure</th>
+            <th>Fallback</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="widget-health-body"></tbody>
+      </table>
     </section>
 
     <section class="panel">
       <h2>Pages</h2>
-      <ul>
+      <ul id="pages-list">
         {% for page in pages %}
-        <li>{{ page.page_id }} ({{ page.layout }})</li>
+        <li data-page-id="{{ page.page_id }}">{{ page.page_id }} ({{ page.layout }})</li>
         {% endfor %}
       </ul>
     </section>
   </main>
 <script>
+const REFRESH_MS = 5000;
 const preview = document.getElementById('preview');
 const refreshBtn = document.getElementById('refresh');
 const overrideForm = document.getElementById('override-form');
 const brightnessForm = document.getElementById('brightness-form');
+const pinPageSelect = document.getElementById('pin-page-select');
+const pinSelectedBtn = document.getElementById('pin-selected');
+const unpinCurrentBtn = document.getElementById('unpin-current');
+const modeEl = document.getElementById('mode');
+const currentPageEl = document.getElementById('current-page');
+const pinnedPageEl = document.getElementById('pinned-page');
+const brightnessValueEl = document.getElementById('brightness-value');
+const lastUpdatedEl = document.getElementById('last-updated');
+const widgetHealthBody = document.getElementById('widget-health-body');
+
+const pagesById = {};
+for (const option of pinPageSelect.options) {
+  const parts = option.textContent.split(' - ');
+  pagesById[option.value] = parts.length > 1 ? parts.slice(1).join(' - ').trim() : option.value;
+}
+
+function formatDate(value) {
+  if (!value) {
+    return '-';
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+  return date.toLocaleString();
+}
+
+function statusBadge(text, tone) {
+  return `<span class="badge ${tone}">${text}</span>`;
+}
+
+function toneForFreshness(freshness) {
+  if (freshness === 'fresh') return 'ok';
+  if (freshness === 'stale') return 'warn';
+  if (freshness === 'fallback') return 'warn';
+  return 'error';
+}
+
+function toneForHealth(health) {
+  if (health === 'healthy') return 'ok';
+  if (health === 'degraded') return 'warn';
+  return 'error';
+}
+
+function renderWidgetHealth(widgetPayload) {
+  const statusMap = widgetPayload.status || {};
+  const dataMap = widgetPayload.data || {};
+  const widgetIds = Object.keys(statusMap).sort();
+  widgetHealthBody.innerHTML = '';
+  for (const widgetId of widgetIds) {
+    const status = statusMap[widgetId] || {};
+    const data = dataMap[widgetId] || {};
+    const freshness = status.last_freshness || data.freshness || 'unknown';
+    const health = status.health_state || data.health_state || 'unknown';
+    const sourceLabel = status.source_label || data.source_label || 'unknown';
+    const fallback = status.fallback_active ? 'yes' : 'no';
+    const details = status.last_error_message || status.status_summary || data.status_summary || '-';
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${widgetId}</td>
+      <td>${statusBadge(health, toneForHealth(health))}</td>
+      <td>${statusBadge(freshness, toneForFreshness(freshness))}</td>
+      <td>${sourceLabel}</td>
+      <td>${formatDate(status.last_success_time)}</td>
+      <td>${formatDate(status.last_failure_time)}</td>
+      <td>${fallback}</td>
+      <td>${details}</td>
+    `;
+    widgetHealthBody.appendChild(row);
+  }
+}
+
+function updatePageHighlights(currentPageId, pinnedPageId) {
+  const items = document.querySelectorAll('#pages-list li');
+  for (const item of items) {
+    item.classList.remove('active-page', 'pinned-page');
+    const pageId = item.dataset.pageId;
+    if (pageId === currentPageId) {
+      item.classList.add('active-page');
+    }
+    if (pageId === pinnedPageId) {
+      item.classList.add('pinned-page');
+    }
+  }
+}
+
+async function refreshDashboard() {
+  const [statusRes, widgetsRes] = await Promise.all([
+    fetch('/api/status'),
+    fetch('/api/widgets'),
+  ]);
+  if (!statusRes.ok || !widgetsRes.ok) {
+    return;
+  }
+  const status = await statusRes.json();
+  const widgetsPayload = await widgetsRes.json();
+
+  modeEl.textContent = status.mode;
+  const currentPageLabel = status.current_page_id ? `${status.current_page_id} (${pagesById[status.current_page_id] || 'unnamed'})` : 'none';
+  const pinnedPageLabel = status.pinned_page_id ? `${status.pinned_page_id} (${pagesById[status.pinned_page_id] || 'unnamed'})` : 'none';
+  currentPageEl.textContent = currentPageLabel;
+  pinnedPageEl.textContent = pinnedPageLabel;
+  brightnessValueEl.textContent = String(status.brightness);
+  if (status.pinned_page_id) {
+    pinPageSelect.value = status.pinned_page_id;
+  }
+  updatePageHighlights(status.current_page_id, status.pinned_page_id);
+  renderWidgetHealth(widgetsPayload);
+  preview.src = '/api/preview?t=' + Date.now();
+  lastUpdatedEl.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+}
 
 refreshBtn.addEventListener('click', () => {
   preview.src = '/api/preview?t=' + Date.now();
+});
+
+pinSelectedBtn.addEventListener('click', async () => {
+  const pageId = pinPageSelect.value;
+  await fetch('/api/pin-page', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({page_id: pageId}),
+  });
+  await refreshDashboard();
+});
+
+unpinCurrentBtn.addEventListener('click', async () => {
+  await fetch('/api/pin-page', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({page_id: null}),
+  });
+  await refreshDashboard();
 });
 
 overrideForm.addEventListener('submit', async (event) => {
@@ -74,12 +233,18 @@ overrideForm.addEventListener('submit', async (event) => {
 brightnessForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   const brightness = Number(document.getElementById('brightness').value || 60);
-  await fetch('/api/brightness', {
+  const response = await fetch('/api/brightness', {
     method: 'POST',
     headers: {'content-type': 'application/json'},
     body: JSON.stringify({brightness}),
   });
+  if (response.ok) {
+    await refreshDashboard();
+  }
 });
+
+refreshDashboard();
+setInterval(refreshDashboard, REFRESH_MS);
 </script>
 </body>
 </html>

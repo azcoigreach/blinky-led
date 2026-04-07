@@ -109,11 +109,17 @@ class DashboardRuntime:
         return out.getvalue()
 
     def status(self) -> dict:
+        page_by_id = {page.page_id: page.name for page in self.pages}
+        current_page_id = self.state.current_page_id
+        pinned_page_id = self.state.pinned_page_id
         return {
             "running": self.state.running,
             "mode": self.state.mode,
-            "current_page_id": self.state.current_page_id,
-            "pinned_page_id": self.state.pinned_page_id,
+            "current_page_id": current_page_id,
+            "current_page_name": page_by_id.get(current_page_id) if current_page_id else None,
+            "pinned_page_id": pinned_page_id,
+            "pinned_page_name": page_by_id.get(pinned_page_id) if pinned_page_id else None,
+            "page_ids": [page.page_id for page in self.pages],
             "brightness": self.state.brightness,
             "override_message": self.state.override_message,
             "last_frame": self._last_frame.model_dump(mode="json"),
