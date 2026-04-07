@@ -4,6 +4,7 @@
 
 - Python 3.13+
 - No physical LED matrix required
+- v3 runtime only (`app/` package)
 
 ## Setup
 

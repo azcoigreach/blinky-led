@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blinky-led"
+version = "3.0.1"
+description = "Blinky LED v3 dashboard for 128x32 HUB75 panels"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { file = "LICENSE" }
+authors = [
+  { name = "azcoigreach" }
+]
+dependencies = [
+  "click>=8.1",
+  "fastapi>=0.116",
+  "httpx>=0.28",
+  "Jinja2>=3.1",
+  "Pillow>=11.0",
+  "pydantic>=2.10",
+  "python-dotenv>=1.0",
+  "PyYAML>=6.0",
+  "psutil>=6.1",
+  "uvicorn>=0.34",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.25",
+]
+test = [
+  "pytest>=8.3",
+  "pytest-asyncio>=0.25",
+]
+pi5 = [
+  "adafruit-blinka-raspberry-pi5-piomatter>=1.0.0",
+]
+
+[project.scripts]
+blinky = "app.cli:cli"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["app", "app.*"]
+
+[tool.setuptools.package-data]
+app = [
+  "web/templates/*.html",
+  "web/static/*",
+  "media/fonts/*",
+  "media/images/*",
+]

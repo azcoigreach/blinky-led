@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1 - 2026-04-06
+
+- Finalized packaging migration to `pyproject.toml` and removed legacy `setup.py`.
+- Retired legacy `blinky/` runtime path so `app/` is the only supported runtime package.
+- Updated deployment and migration docs to reflect the v3-only architecture.
+
 ## 3.0.0 - 2026-04-06
 
 - Re-architected project as a modular dashboard platform under `app/`.
