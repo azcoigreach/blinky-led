@@ -45,6 +45,9 @@ class WidgetConfig(BaseModel):
     refresh_seconds: int = 60
     ttl_seconds: int = 180
     retries: int = 2
+    retry_backoff_seconds: float = 0.4
+    fallback_policy: str = "last_known_or_synthetic"
+    source_label: str | None = None
     config: dict[str, Any] = Field(default_factory=dict)
 
 

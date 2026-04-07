@@ -17,16 +17,45 @@ class Severity(str, Enum):
 class Freshness(str, Enum):
     fresh = "fresh"
     stale = "stale"
+    fallback = "fallback"
     error = "error"
+
+
+class DataOrigin(str, Enum):
+    primary = "primary"
+    cache = "cache"
+    fallback = "fallback"
+    synthetic = "synthetic"
+
+
+class HealthState(str, Enum):
+    healthy = "healthy"
+    degraded = "degraded"
+    failed = "failed"
 
 
 class WidgetStatus(BaseModel):
     widget_id: str
     healthy: bool = True
+    health_state: HealthState = HealthState.healthy
     last_refresh: datetime | None = None
+    last_success_time: datetime | None = None
+    last_attempt_time: datetime | None = None
+    last_failure_time: datetime | None = None
     last_error: str | None = None
+    last_error_message: str | None = None
     retries: int = 0
+    retry_count_used: int = 0
+    attempts_made: int = 0
+    consecutive_failures: int = 0
     source_health: str = "unknown"
+    source_label: str = "local"
+    fallback_active: bool = False
+    serving_stale_data: bool = False
+    last_data_origin: DataOrigin = DataOrigin.primary
+    last_freshness: Freshness = Freshness.fresh
+    status_summary: str = "ready"
+    debug: dict[str, Any] = Field(default_factory=dict)
 
 
 class WidgetData(BaseModel):
@@ -38,7 +67,11 @@ class WidgetData(BaseModel):
     severity: Severity = Severity.info
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     freshness: Freshness = Freshness.fresh
+    data_origin: DataOrigin = DataOrigin.primary
+    health_state: HealthState = HealthState.healthy
     source_label: str = "local"
+    status_summary: str = "ok"
+    debug: dict[str, Any] = Field(default_factory=dict)
     extra: dict[str, Any] = Field(default_factory=dict)
 
 

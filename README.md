@@ -1,4 +1,4 @@
-# Blinky LED v3.0.1
+# Blinky LED v3.0.2
 
 Blinky v3 is a modular LED information dashboard platform for 128x32 HUB75 panels.
 
@@ -18,6 +18,7 @@ The legacy `blinky/` command runtime has been retired. The only supported runtim
 - Widget/plugin system with background scheduling and TTL caching
 - Page rotation with pinning and compact 128x32 layout templates
 - YAML config + pydantic validation + `.env` secret loading
+- Widget health lifecycle with retries, fallback, and debuggable status metadata
 
 Starter widgets:
 
@@ -109,6 +110,24 @@ sudo journalctl -u blinky-dashboard.service -f
 - `POST /api/brightness`
 - `POST /api/pin-page`
 - `POST /api/reload`
+
+## Widget Runtime Model
+
+Widgets run with a shared lifecycle contract:
+
+- `fetch_primary()` for normal data acquisition
+- centralized retry policy (`retries` + `retry_backoff_seconds`)
+- explicit fallback policy (`last_known_or_synthetic`, `last_known`, `synthetic`)
+- operational status tracking in `/api/widgets` (attempts, last success/failure, consecutive failures, fallback state)
+
+Each widget payload exposes normalized operational fields:
+
+- freshness (`fresh`, `stale`, `fallback`, `error`)
+- data origin (`primary`, `cache`, `fallback`, `synthetic`)
+- health state (`healthy`, `degraded`, `failed`)
+- status summary and debug metadata
+
+This keeps the panel readable while making degraded and failed states visible in API/debug output.
 
 ## Docs
 

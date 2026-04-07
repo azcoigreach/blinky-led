@@ -25,7 +25,7 @@ def create_web_app(runtime: DashboardRuntime) -> FastAPI:
         if runtime.state.running:
             await runtime.stop()
 
-    app = FastAPI(title="Blinky LED Dashboard", version="3.0.1", lifespan=lifespan)
+    app = FastAPI(title="Blinky LED Dashboard", version="3.0.2", lifespan=lifespan)
     base = Path(__file__).parent
     templates = Jinja2Templates(directory=str(base / "templates"))
     app.mount("/static", StaticFiles(directory=str(base / "static")), name="static")

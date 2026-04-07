@@ -37,6 +37,10 @@ def build_widgets(config: DashboardConfig) -> dict[str, Widget]:
             widget_id=name,
             refresh_seconds=widget_cfg.refresh_seconds,
             ttl_seconds=widget_cfg.ttl_seconds,
+            retries=widget_cfg.retries,
+            retry_backoff_seconds=widget_cfg.retry_backoff_seconds,
+            fallback_policy=widget_cfg.fallback_policy,
+            source_label=widget_cfg.source_label or name,
             config=widget_cfg.config,
         )
     return widgets

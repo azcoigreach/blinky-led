@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.2 - 2026-04-06
+
+- Hardened the widget runtime around a shared lifecycle with centralized retry, fallback, and status tracking.
+- Expanded normalized widget data and status models so degraded, stale, fallback, and failed states are explicit in API output.
+- Upgraded local `clock` and `system` widgets with richer configuration, structured metadata, and robust degraded behavior.
+- Added targeted tests for retry handling, stale last-known-good serving, synthetic fallback output, and scheduler/widget integration.
+
 ## 3.0.1 - 2026-04-06
 
 - Finalized packaging migration to `pyproject.toml` and removed legacy `setup.py`.

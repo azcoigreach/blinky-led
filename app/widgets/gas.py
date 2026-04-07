@@ -5,7 +5,14 @@ from app.widgets.base import Widget
 
 
 class GasWidget(Widget):
-    async def fetch(self):
+    async def fetch_primary(self):
         usd = float(self.config.get("fixture_price", 3.89))
         sev = Severity.warning if usd >= 5.0 else Severity.info
-        return self.normalized("Gas", f"${usd:.2f}/gal", severity=sev, source_label="fixture")
+        return self.normalized(
+            "Gas",
+            f"${usd:.2f}/gal",
+            severity=sev,
+            source_label="fixture",
+            status_summary="gas fixture loaded",
+            extra={"usd_per_gallon": usd},
+        )
