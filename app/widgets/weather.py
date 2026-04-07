@@ -6,13 +6,22 @@ from app.widgets.base import Widget
 
 
 class WeatherWidget(Widget):
-    async def fetch(self):
+    async def fetch_primary(self):
         city = self.config.get("city", "London")
         fixture = self.config.get("fixture_temp")
         if fixture is not None:
             temp = float(fixture)
+            source = "fixture"
         else:
             payload = await fetch_json(f"https://wttr.in/{city}?format=j1")
             temp = float(payload["current_condition"][0]["temp_C"])
+            source = "wttr.in"
         sev = Severity.warning if temp >= 35 else Severity.ok
-        return self.normalized("Weather", f"{city[:8]} {temp:.0f}C", severity=sev, source_label="wttr.in")
+        return self.normalized(
+            "Weather",
+            f"{city[:8]} {temp:.0f}C",
+            severity=sev,
+            source_label=source,
+            status_summary="weather loaded",
+            extra={"city": city, "temp_c": temp},
+        )

@@ -2,10 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from datetime import UTC, datetime
 
 from app.core.cache import TTLCache
-from app.core.models import Freshness, WidgetData, WidgetStatus
+from app.core.models import WidgetData, WidgetStatus
 from app.widgets.base import Widget
 
 logger = logging.getLogger(__name__)
@@ -40,37 +39,20 @@ class WidgetScheduler:
         wid = widget.widget_id
         self.status.setdefault(wid, WidgetStatus(widget_id=wid))
         while self._running:
-            cached = self.cache.get(wid)
-            if cached:
-                self._data[wid] = cached
-                await asyncio.sleep(max(1, widget.refresh_seconds // 2))
-                continue
             try:
-                data = await widget.fetch()
-                data.timestamp = datetime.now(UTC)
+                data, status = await widget.run_cycle()
                 self._data[wid] = data
                 self.cache.set(wid, data, widget.ttl_seconds)
-                self.status[wid] = WidgetStatus(
-                    widget_id=wid,
-                    healthy=True,
-                    last_refresh=datetime.now(UTC),
-                    retries=0,
-                    source_health="ok",
-                )
+                self.status[wid] = status
                 logger.info("widget refresh success: %s", wid)
             except Exception as exc:  # noqa: BLE001
-                previous = self._data.get(wid)
-                if previous:
-                    previous.freshness = Freshness.stale
-                    self._data[wid] = previous
-                curr = self.status.get(wid, WidgetStatus(widget_id=wid))
-                self.status[wid] = WidgetStatus(
-                    widget_id=wid,
-                    healthy=False,
-                    last_refresh=curr.last_refresh,
-                    retries=curr.retries + 1,
-                    last_error=str(exc),
-                    source_health="degraded",
-                )
+                current = self.status.get(wid, WidgetStatus(widget_id=wid))
+                current.healthy = False
+                current.last_error = str(exc)
+                current.last_error_message = str(exc)
+                current.source_health = "failed"
+                current.status_summary = "scheduler execution failure"
+                current.consecutive_failures += 1
+                self.status[wid] = current
                 logger.exception("widget refresh failed: %s", wid)
             await asyncio.sleep(widget.refresh_seconds)
