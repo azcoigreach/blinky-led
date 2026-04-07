@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "blinky-led"
-version = "3.0.2"
+version = "3.1.0"
 description = "Blinky LED v3 dashboard for 128x32 HUB75 panels"
 readme = "README.md"
 requires-python = ">=3.13"

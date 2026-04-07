@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.0 - 2026-04-06
+
+- Added provider architecture under `app/providers/` for `news`, `crypto`, `stocks/futures`, `poll`, and `gas` with fixture/manual and adapter-ready external providers.
+- Refactored external-source widgets to consume provider objects instead of embedding source-specific HTTP logic in widget classes.
+- Upgraded web control UI with pin selected page, unpin current page, active/pinned page visibility, and auto-refresh polling for status and preview.
+- Added operational widget health table in UI with health/freshness badges, source labels, fallback state, and last success/failure timestamps.
+- Expanded tests for pin/unpin API flow, provider selection behavior, provider normalization, and widget/provider integration.
+
 ## 3.0.2 - 2026-04-06
 
 - Hardened the widget runtime around a shared lifecycle with centralized retry, fallback, and status tracking.

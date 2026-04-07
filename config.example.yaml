@@ -45,7 +45,9 @@ widgets:
     ttl_seconds: 180
     retries: 2
     config:
+      provider: fixture # fixture | marketdata
       symbol: "SPY"
+      market_type: stock # stock | futures
       fixture_price: 510.33
       fixture_delta: -0.24
   crypto:
@@ -54,20 +56,30 @@ widgets:
     ttl_seconds: 120
     retries: 2
     config:
+      provider: binance # binance | coingecko | fixture
       symbol: "BTCUSDT"
+      fixture_price: 68000
+      fixture_change_percent: 1.2
   gas:
     enabled: true
     refresh_seconds: 3600
     ttl_seconds: 7200
     retries: 1
     config:
+      provider: fixture # fixture | manual | aaa
+      region: "US"
       fixture_price: 3.99
+      manual_price: 3.89
+      endpoint: ""
   news:
     enabled: true
     refresh_seconds: 120
     ttl_seconds: 300
     retries: 2
     config:
+      provider: fixture # fixture | rss | newsapi
+      feed_url: "https://feeds.reuters.com/reuters/businessNews"
+      query: "markets"
       fixture_headlines:
         - "Market breadth turns negative"
         - "Gas futures stabilize"
@@ -78,8 +90,10 @@ widgets:
     ttl_seconds: 600
     retries: 2
     config:
+      provider: fixture # fixture | external
       candidate: "Candidate A"
       fixture_percent: 48.2
+      endpoint: ""
   system:
     enabled: true
     refresh_seconds: 5

@@ -1,4 +1,4 @@
-# Blinky LED v3.0.2
+# Blinky LED v3.1.0
 
 Blinky v3 is a modular LED information dashboard platform for 128x32 HUB75 panels.
 
@@ -17,8 +17,10 @@ The legacy `blinky/` command runtime has been retired. The only supported runtim
 - First-class simulator renderer (hardware-free local development)
 - Widget/plugin system with background scheduling and TTL caching
 - Page rotation with pinning and compact 128x32 layout templates
+- Operational web controls for active/pinned page management and widget health/freshness monitoring
 - YAML config + pydantic validation + `.env` secret loading
 - Widget health lifecycle with retries, fallback, and debuggable status metadata
+- Provider architecture for external-source widgets (`news`, `crypto`, `stocks/futures`, `poll`, `gas`)
 
 Starter widgets:
 
@@ -37,6 +39,7 @@ Starter widgets:
 ```
 app/
   core/       # config, models, scheduler, cache, logging, settings
+  providers/  # provider interfaces + concrete source adapters + fixture/manual providers
   widgets/    # widget interface + starter widgets
   render/     # renderer abstraction + piomatter/simulator + layout engine
   web/        # FastAPI app, routes, templates, static
@@ -110,6 +113,32 @@ sudo journalctl -u blinky-dashboard.service -f
 - `POST /api/brightness`
 - `POST /api/pin-page`
 - `POST /api/reload`
+
+`/api/status` and `/api/widgets` are designed for lightweight frontend polling and now expose enough information to drive operational controls and health/freshness state in the web UI.
+
+## Provider Architecture
+
+External-source widgets use provider classes selected by widget config (`widgets.<name>.config.provider`). Widgets are responsible for panel presentation and fallback behavior, while providers own source-specific API/RSS logic and normalization.
+
+Provider families:
+
+- News: `fixture`, `rss`, `newsapi`
+- Crypto: `binance`, `coingecko`, `fixture`
+- Stocks/Futures: `fixture`, `marketdata` (adapter-ready)
+- Poll: `fixture`, `external` (adapter-ready)
+- Gas: `fixture`, `manual`, `aaa` (adapter-ready)
+
+This keeps widget code extensible and avoids source-specific HTTP logic leaking into display components.
+
+## Web UI Controls
+
+The default FastAPI/Jinja UI includes practical operations for runtime control:
+
+- pin selected page
+- unpin current page
+- active vs pinned page display and highlighting
+- auto-refresh loop for status, preview, and widget health panel
+- widget health table with source, freshness, fallback, and last success/failure visibility
 
 ## Widget Runtime Model
 
