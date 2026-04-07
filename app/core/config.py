@@ -1,0 +1,81 @@
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any, Literal
+
+import yaml
+from pydantic import BaseModel, Field, field_validator
+
+
+class PanelConfig(BaseModel):
+    width: int = 128
+    height: int = 32
+
+
+class RendererConfig(BaseModel):
+    mode: Literal["simulator", "piomatter"] = "simulator"
+    hardware_mapping: str = "adafruit-hat"
+    n_addr_lines: int = 4
+
+    @field_validator("mode", mode="before")
+    @classmethod
+    def normalize_mode(cls, value: Any) -> str:
+        if isinstance(value, str):
+            normalized = value.strip().lower()
+            if normalized == "hardware":
+                return "piomatter"
+            return normalized
+        return value
+
+
+class ApiConfig(BaseModel):
+    host: str = "0.0.0.0"
+    port: int = 8080
+
+
+class ScheduleConfig(BaseModel):
+    day_brightness: int = 70
+    night_brightness: int = 25
+    day_start_hour: int = 7
+    night_start_hour: int = 22
+
+
+class WidgetConfig(BaseModel):
+    enabled: bool = True
+    refresh_seconds: int = 60
+    ttl_seconds: int = 180
+    retries: int = 2
+    config: dict[str, Any] = Field(default_factory=dict)
+
+
+class PageConfig(BaseModel):
+    page_id: str
+    name: str
+    layout: str
+    widgets: list[str] = Field(default_factory=list)
+    duration_seconds: int = 8
+    pinned: bool = False
+    ticker_widget: str | None = None
+
+
+class DashboardConfig(BaseModel):
+    panel: PanelConfig = Field(default_factory=PanelConfig)
+    renderer: RendererConfig = Field(default_factory=RendererConfig)
+    api: ApiConfig = Field(default_factory=ApiConfig)
+    schedule: ScheduleConfig = Field(default_factory=ScheduleConfig)
+    widgets: dict[str, WidgetConfig] = Field(default_factory=dict)
+    pages: list[PageConfig] = Field(default_factory=list)
+
+    @field_validator("pages")
+    @classmethod
+    def pages_must_exist(cls, value: list[PageConfig]) -> list[PageConfig]:
+        if not value:
+            raise ValueError("At least one page must be configured")
+        return value
+
+
+def load_config(path: str | Path) -> DashboardConfig:
+    config_path = Path(path)
+    with config_path.open("r", encoding="utf-8") as fp:
+        payload = yaml.safe_load(fp) or {}
+    return DashboardConfig.model_validate(payload)

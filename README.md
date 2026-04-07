@@ -1,28 +1,93 @@
-## Blinky LED v2 [WIP]
+# Blinky LED v3.0.0
 
-* Requires:
-Matrix Driver - https://github.com/hzeller/rpi-rgb-led-matrix
+Blinky v3 is a modular LED information dashboard platform for 128x32 HUB75 panels.
 
-* **Pi 5 Support:**
-  - **Option 1 (This Project)**: Patched hzeller library for Pi 5
-    - Uses Pi 4 peripheral address mapping (0xfe000000) which is compatible with Pi 5's GPIO
-    - Added Pi 5 revision detection (code 0x17, CM5 code 0x18)
-    - Works with single channel Adafruit HAT/Bonnet setups
-    - See issue: https://github.com/hzeller/rpi-rgb-led-matrix/issues/1603
-  
-  - **Option 2 (Official Adafruit Solution)**: Use Adafruit's PioMatter library
-    - Separate standalone driver using RP1 PIO interface
-    - Supports both single and 3-channel output
-    - Repository: https://github.com/adafruit/Adafruit_Blinka_Raspberry_Pi5_Piomatter
-    - Guide: https://learn.adafruit.com/adafruit-triple-led-matrix-bonnet-for-raspberry-pi-with-hub75/raspberry-pi-5-setup
+Primary target:
 
-* Usage:
+- Raspberry Pi 5
+- Adafruit Piomatter backend (`adafruit-blinka-raspberry-pi5-piomatter`)
+- Python 3.13+
+
+`rpi-rgb-led-matrix` is no longer the main architecture in v3.
+
+## Features
+
+- FastAPI web control UI + REST API
+- Piomatter renderer for Pi 5 hardware
+- First-class simulator renderer (hardware-free local development)
+- Widget/plugin system with background scheduling and TTL caching
+- Page rotation with pinning and compact 128x32 layout templates
+- YAML config + pydantic validation + `.env` secret loading
+
+Starter widgets:
+
+- `clock`
+- `weather`
+- `stocks`
+- `crypto`
+- `gas`
+- `news`
+- `poll`
+- `system`
+- `custom_text`
+
+## Architecture
+
 ```
-$ pip3 install --editable .
-$ blinky --help
+app/
+  core/       # config, models, scheduler, cache, logging, settings
+  widgets/    # widget interface + starter widgets
+  render/     # renderer abstraction + piomatter/simulator + layout engine
+  web/        # FastAPI app, routes, templates, static
+  services/   # fetch helpers and transforms
+  pages/      # page definition and rotation control
 ```
 
-* Running the clock on Pi 5 (piomatter backend — recommended):
+## Quick start (simulator)
+
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install -e .[dev]
+cp config.example.yaml config.yaml
+cp .env.example .env
+blinky serve --config config.yaml
 ```
-sudo .venv/bin/blinky --rows 32 --cols 64 --chain_length 2 --hardware_mapping adafruit-hat-pwm --backend piomatter clock
+
+Open http://localhost:8080.
+
+## Quick start (Pi 5 + Piomatter)
+
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install -e .[pi5]
+cp config.example.yaml config.yaml
+cp .env.example .env
 ```
+
+Set `renderer.mode: piomatter` in `config.yaml`, then run:
+
+```bash
+sudo .venv/bin/blinky serve --config config.yaml --host 0.0.0.0 --port 8080
+```
+
+## REST API
+
+- `GET /api/status`
+- `GET /api/widgets`
+- `GET /api/pages`
+- `GET /api/config`
+- `GET /api/preview`
+- `GET /api/schedule`
+- `POST /api/override`
+- `POST /api/brightness`
+- `POST /api/pin-page`
+- `POST /api/reload`
+
+## Docs
+
+- Simulator developer guide: `docs/DEVELOPMENT_SIMULATOR.md`
+- Pi 5 deployment guide: `docs/DEPLOY_PI5_PIOMATTER.md`
+- Migration notes: `docs/MIGRATION_V3.md`
+- Changelog: `CHANGELOG.md`

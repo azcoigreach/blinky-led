@@ -1,0 +1,109 @@
+panel:
+  width: 128
+  height: 32
+
+renderer:
+  mode: simulator
+  hardware_mapping: adafruit-hat
+  n_addr_lines: 4
+
+api:
+  host: 0.0.0.0
+  port: 8080
+
+schedule:
+  day_brightness: 70
+  night_brightness: 25
+  day_start_hour: 7
+  night_start_hour: 22
+
+widgets:
+  clock:
+    enabled: true
+    refresh_seconds: 1
+    ttl_seconds: 2
+    retries: 1
+    config: {}
+  weather:
+    enabled: true
+    refresh_seconds: 120
+    ttl_seconds: 300
+    retries: 2
+    config:
+      city: "New York"
+  stocks:
+    enabled: true
+    refresh_seconds: 90
+    ttl_seconds: 180
+    retries: 2
+    config:
+      symbol: "SPY"
+      fixture_price: 510.33
+      fixture_delta: -0.24
+  crypto:
+    enabled: true
+    refresh_seconds: 60
+    ttl_seconds: 120
+    retries: 2
+    config:
+      symbol: "BTCUSDT"
+  gas:
+    enabled: true
+    refresh_seconds: 3600
+    ttl_seconds: 7200
+    retries: 1
+    config:
+      fixture_price: 3.99
+  news:
+    enabled: true
+    refresh_seconds: 120
+    ttl_seconds: 300
+    retries: 2
+    config:
+      fixture_headlines:
+        - "Market breadth turns negative"
+        - "Gas futures stabilize"
+        - "Weather warnings continue"
+  poll:
+    enabled: true
+    refresh_seconds: 300
+    ttl_seconds: 600
+    retries: 2
+    config:
+      candidate: "Candidate A"
+      fixture_percent: 48.2
+  system:
+    enabled: true
+    refresh_seconds: 5
+    ttl_seconds: 10
+    retries: 1
+    config: {}
+  custom_text:
+    enabled: true
+    refresh_seconds: 300
+    ttl_seconds: 600
+    retries: 1
+    config:
+      message: "Blinky dashboard online"
+
+pages:
+  - page_id: overview
+    name: Overview
+    layout: two_column
+    widgets: [clock, weather]
+    duration_seconds: 8
+  - page_id: markets
+    name: Markets
+    layout: two_column
+    widgets: [stocks, crypto]
+    duration_seconds: 8
+  - page_id: ticker
+    name: Ticker
+    layout: ticker_only
+    widgets: [news]
+    duration_seconds: 10
+  - page_id: alerts
+    name: Alerts
+    layout: alert_fullscreen
+    widgets: [custom_text]
+    duration_seconds: 6
