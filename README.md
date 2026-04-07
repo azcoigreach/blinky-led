@@ -1,4 +1,4 @@
-# Blinky LED v3.1.0
+# Blinky LED v3.0.3
 
 Blinky v3 is a modular LED information dashboard platform for 128x32 HUB75 panels.
 

@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.1.0 - 2026-04-06
+## 3.0.3 - 2026-04-06
 
 - Added provider architecture under `app/providers/` for `news`, `crypto`, `stocks/futures`, `poll`, and `gas` with fixture/manual and adapter-ready external providers.
 - Refactored external-source widgets to consume provider objects instead of embedding source-specific HTTP logic in widget classes.
