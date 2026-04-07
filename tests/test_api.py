@@ -3,6 +3,7 @@ from click.testing import CliRunner
 
 from app.cli import cli
 from app.core.config import DashboardConfig
+from app.core.models import Freshness, HealthState, WidgetStatus
 from app.runtime import DashboardRuntime
 from app.web.server import create_web_app
 
@@ -87,11 +88,42 @@ def test_api_pin_page_valid_and_invalid() -> None:
         assert valid.status_code == 200
         assert valid.json()["pinned_page_id"] == "p1"
 
+        unpin = client.post("/api/pin-page", json={"page_id": None})
+        assert unpin.status_code == 200
+        assert unpin.json()["pinned_page_id"] is None
+
         invalid_shape = client.post("/api/pin-page", json={"page_id": "bad id"})
         assert invalid_shape.status_code == 422
 
         unknown_page = client.post("/api/pin-page", json={"page_id": "missing"})
         assert unknown_page.status_code == 404
+
+
+def test_api_widgets_status_shape() -> None:
+    runtime = DashboardRuntime(_make_config())
+    runtime.state.widget_status["clock"] = WidgetStatus(
+        widget_id="clock",
+        healthy=True,
+        health_state=HealthState.healthy,
+        source_label="fixture",
+        last_freshness=Freshness.fresh,
+        status_summary="ok",
+    )
+    app = create_web_app(runtime)
+    with TestClient(app) as client:
+        widgets = client.get("/api/widgets")
+        assert widgets.status_code == 200
+        status_payload = widgets.json()["status"]["clock"]
+        assert {
+            "widget_id",
+            "health_state",
+            "last_freshness",
+            "source_label",
+            "last_success_time",
+            "last_failure_time",
+            "fallback_active",
+            "status_summary",
+        }.issubset(status_payload.keys())
 
 
 def test_cli_accepts_config_after_subcommand(tmp_path, monkeypatch) -> None:

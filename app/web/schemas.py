@@ -59,7 +59,10 @@ class StatusResponse(BaseModel):
     running: bool
     mode: str
     current_page_id: str | None = None
+    current_page_name: str | None = None
     pinned_page_id: str | None = None
+    pinned_page_name: str | None = None
+    page_ids: list[str] = Field(default_factory=list)
     brightness: int
     override_message: str | None = None
     last_frame: RenderFrame
