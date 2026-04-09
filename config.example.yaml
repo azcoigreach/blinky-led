@@ -3,7 +3,7 @@ panel:
   height: 32
 
 renderer:
-  mode: piomatter
+  mode: simulator
   hardware_mapping: adafruit-hat
   n_addr_lines: 4
 
@@ -69,7 +69,6 @@ providers:
 widgets:
   clock:
     enabled: true
-    run_mode: page_bound # page_bound | background_always
     refresh_seconds: 1
     ttl_seconds: 2
     retries: 1
@@ -84,7 +83,6 @@ widgets:
       date_format: "%Y-%m-%d"
   weather:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 120
     ttl_seconds: 300
     retries: 2
@@ -92,7 +90,6 @@ widgets:
       city: "New York"
   stocks:
     enabled: true
-    run_mode: background_always
     refresh_seconds: 90
     ttl_seconds: 180
     retries: 2
@@ -106,7 +103,6 @@ widgets:
       fixture_percent_change: -0.24
   markets:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 90
     ttl_seconds: 180
     retries: 2
@@ -120,7 +116,6 @@ widgets:
         IWM: RUSSELL
   futures:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 120
     ttl_seconds: 300
     retries: 2
@@ -135,7 +130,6 @@ widgets:
         CL: CL=F
   crypto:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 60
     ttl_seconds: 120
     retries: 2
@@ -151,7 +145,6 @@ widgets:
       fixture_change_percent: 1.2
   gas:
     enabled: true
-    run_mode: background_always
     refresh_seconds: 3600
     ttl_seconds: 7200
     retries: 1
@@ -163,7 +156,6 @@ widgets:
       endpoint: "https://gasprices.aaa.com/wp-admin/admin-ajax.php" # optional for aaa
   news:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 120
     ttl_seconds: 300
     retries: 2
@@ -177,7 +169,6 @@ widgets:
         - "Weather warnings continue"
   poll:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 300
     ttl_seconds: 600
     retries: 2
@@ -188,7 +179,6 @@ widgets:
       endpoint: ""
   system:
     enabled: true
-    run_mode: background_always
     refresh_seconds: 5
     ttl_seconds: 10
     retries: 1
@@ -199,7 +189,6 @@ widgets:
       disk_path: "/"
   custom_text:
     enabled: true
-    run_mode: page_bound
     refresh_seconds: 300
     ttl_seconds: 600
     retries: 1
@@ -209,31 +198,26 @@ widgets:
 pages:
   - page_id: overview
     name: Overview
-    enabled: true
     layout: two_column
     widgets: [clock, weather]
     duration_seconds: 8
   - page_id: markets
     name: Markets
-    enabled: true
     layout: two_column
     widgets: [stocks, markets]
     duration_seconds: 8
   - page_id: derivatives
     name: Derivatives
-    enabled: true
     layout: two_column
     widgets: [futures, crypto]
     duration_seconds: 8
   - page_id: ticker
     name: Ticker
-    enabled: true
     layout: ticker_only
     widgets: [news]
     duration_seconds: 10
   - page_id: alerts
     name: Alerts
-    enabled: true
     layout: alert_fullscreen
     widgets: [custom_text]
     duration_seconds: 6
