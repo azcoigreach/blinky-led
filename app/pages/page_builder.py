@@ -16,4 +16,5 @@ def build_pages(config: DashboardConfig) -> list[PageDefinition]:
             ticker_widget=page.ticker_widget,
         )
         for page in config.pages
+        if page.enabled
     ]

@@ -19,11 +19,16 @@ body {
   background: radial-gradient(circle at top right, #25374b, var(--bg));
 }
 
-.grid {
+.dashboard-layout {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-areas:
+    "control control control preview preview preview preview preview preview pages pages pages"
+    "health health health health health health health health health health health health"
+    "widget widget widget widget provider provider provider provider builder builder builder builder";
   padding: 16px;
+  align-items: start;
 }
 
 .panel {
@@ -31,6 +36,34 @@ body {
   border: 1px solid #2f465d;
   border-radius: 10px;
   padding: 14px;
+}
+
+.panel-control {
+  grid-area: control;
+}
+
+.panel-preview {
+  grid-area: preview;
+}
+
+.panel-pages {
+  grid-area: pages;
+}
+
+.panel-health {
+  grid-area: health;
+}
+
+.panel-widget-editor {
+  grid-area: widget;
+}
+
+.panel-provider-editor {
+  grid-area: provider;
+}
+
+.panel-page-builder {
+  grid-area: builder;
 }
 
 .status-block p {
@@ -128,11 +161,64 @@ select {
   align-self: center;
 }
 
+.form-grid input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  justify-self: start;
+  align-self: center;
+  accent-color: var(--accent);
+}
+
+.order-list {
+  list-style: none;
+  margin: 4px 0 12px;
+  padding: 0;
+  border: 1px solid #2f465d;
+  border-radius: 8px;
+  background: rgba(7, 14, 22, 0.6);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-bottom: 1px solid #213447;
+  color: var(--ink);
+  cursor: move;
+  user-select: none;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-item.dragging {
+  opacity: 0.5;
+}
+
+.drag-handle {
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
 #widget-health-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
-  table-layout: fixed;
+  min-width: 1200px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 480px;
+  border: 1px solid #294056;
+  border-radius: 8px;
 }
 
 #widget-health-table th,
@@ -142,6 +228,13 @@ select {
   text-align: left;
   vertical-align: top;
   word-break: break-word;
+}
+
+#widget-health-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #132231;
 }
 
 .badge {
@@ -184,5 +277,29 @@ select {
 @media (max-width: 720px) {
   .button-row {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "control"
+      "preview"
+      "pages"
+      "health"
+      "widget"
+      "provider"
+      "builder";
+  }
+
+  .panel-control,
+  .panel-preview,
+  .panel-pages,
+  .panel-health,
+  .panel-editor {
+    grid-column: auto;
+  }
+
+  .table-wrap {
+    max-height: 320px;
   }
 }

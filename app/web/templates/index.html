@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <main class="grid">
-    <section class="panel">
+  <main class="dashboard-layout">
+    <section class="panel panel-control">
       <h1>Blinky v3 Control</h1>
       <div class="status-block">
         <p>Mode: <strong id="mode">{{ status.mode }}</strong></p>
@@ -42,37 +42,14 @@
       </form>
     </section>
 
-    <section class="panel">
+    <section class="panel panel-preview">
       <h2>Preview</h2>
       <img id="preview" src="/api/preview" alt="panel preview" />
       <button id="refresh">Refresh Preview</button>
       <p class="small" id="last-updated">Last updated: never</p>
     </section>
 
-    <section class="panel">
-      <h2>Widget Health</h2>
-      <table id="widget-health-table">
-        <thead>
-          <tr>
-            <th>Widget</th>
-            <th>Active</th>
-            <th>Run Mode</th>
-            <th>Assigned Pages</th>
-            <th>Visible Now</th>
-            <th>Health</th>
-            <th>Freshness</th>
-            <th>Source</th>
-            <th>Last Success</th>
-            <th>Last Failure</th>
-            <th>Fallback</th>
-            <th>Details</th>
-          </tr>
-        </thead>
-        <tbody id="widget-health-body"></tbody>
-      </table>
-    </section>
-
-    <section class="panel">
+    <section class="panel panel-pages">
       <h2>Pages</h2>
       <ul id="pages-list">
         {% for page in pages %}
@@ -81,7 +58,32 @@
       </ul>
     </section>
 
-    <section class="panel">
+    <section class="panel panel-health">
+      <h2>Widget Health</h2>
+      <div class="table-wrap">
+        <table id="widget-health-table">
+          <thead>
+            <tr>
+              <th>Widget</th>
+              <th>Active</th>
+              <th>Run Mode</th>
+              <th>Assigned Pages</th>
+              <th>Visible Now</th>
+              <th>Health</th>
+              <th>Freshness</th>
+              <th>Source</th>
+              <th>Last Success</th>
+              <th>Last Failure</th>
+              <th>Fallback</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="widget-health-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel panel-editor panel-widget-editor">
       <h2>Widget Config</h2>
       <p class="small">Edits include plain-text tokens/API settings inside config JSON.</p>
       <div class="control-row">
@@ -89,7 +91,8 @@
         <select id="widget-editor-select"></select>
       </div>
       <div class="form-grid">
-        <label><input id="widget-enabled" type="checkbox" /> Enabled</label>
+        <label for="widget-enabled">Enabled</label>
+        <input id="widget-enabled" type="checkbox" />
         <label for="widget-run-mode">Run mode</label>
         <select id="widget-run-mode">
           <option value="background_always">background_always</option>
@@ -115,7 +118,7 @@
       <p class="small" id="widget-editor-status">Widget editor ready.</p>
     </section>
 
-    <section class="panel">
+    <section class="panel panel-editor panel-provider-editor">
       <h2>Provider Config</h2>
       <p class="small">Use plain text for tokens/keys per your local-network setup.</p>
       <div class="control-row">
@@ -128,7 +131,8 @@
         </select>
       </div>
       <div class="form-grid">
-        <label><input id="provider-enabled" type="checkbox" /> Enabled</label>
+        <label for="provider-enabled">Enabled</label>
+        <input id="provider-enabled" type="checkbox" />
         <label for="provider-primary">Primary</label>
         <input id="provider-primary" type="text" />
         <label for="provider-fallback">Fallback</label>
@@ -157,19 +161,27 @@
       <p class="small" id="provider-editor-status">Provider editor ready.</p>
     </section>
 
-    <section class="panel">
+    <section class="panel panel-editor panel-page-builder">
       <h2>Page Builder</h2>
       <div class="control-row">
         <label for="page-editor-select">Existing page</label>
         <select id="page-editor-select"></select>
       </div>
       <div class="form-grid">
+        <label for="page-enabled">Enabled</label>
+        <input id="page-enabled" type="checkbox" />
         <label for="page-id">Page ID</label>
         <input id="page-id" type="text" />
         <label for="page-name">Name</label>
         <input id="page-name" type="text" />
         <label for="page-layout">Layout / Type</label>
-        <input id="page-layout" type="text" placeholder="single_kpi, two_column, ticker_only..." />
+        <select id="page-layout" name="page-layout">
+          <option value="single_kpi">single_kpi</option>
+          <option value="two_column">two_column</option>
+          <option value="ticker_only">ticker_only</option>
+          <option value="split_banner">split_banner</option>
+          <option value="alert_fullscreen">alert_fullscreen</option>
+        </select>
         <label for="page-duration">Duration (sec)</label>
         <input id="page-duration" type="number" min="1" />
         <label for="page-widgets">Widgets (comma)</label>
@@ -185,6 +197,8 @@
         <button id="page-delete" type="button" class="secondary">Delete Page</button>
         <button id="page-new" type="button" class="secondary">New Draft</button>
       </div>
+      <label>Drag and drop page order</label>
+      <ul id="page-order-list" class="order-list"></ul>
       <label for="page-order">Page order (comma-separated page IDs)</label>
       <input id="page-order" type="text" />
       <button id="page-reorder-apply" type="button">Reorder + Apply</button>
@@ -237,6 +251,7 @@ const providerSaveApplyBtn = document.getElementById('provider-save-apply');
 const providerEditorStatus = document.getElementById('provider-editor-status');
 
 const pageEditorSelect = document.getElementById('page-editor-select');
+const pageEnabledInput = document.getElementById('page-enabled');
 const pageIdInput = document.getElementById('page-id');
 const pageNameInput = document.getElementById('page-name');
 const pageLayoutInput = document.getElementById('page-layout');
@@ -244,12 +259,15 @@ const pageDurationInput = document.getElementById('page-duration');
 const pageWidgetsInput = document.getElementById('page-widgets');
 const pageTickerWidgetInput = document.getElementById('page-ticker-widget');
 const pageOrderInput = document.getElementById('page-order');
+const pageOrderList = document.getElementById('page-order-list');
 const pageSaveBtn = document.getElementById('page-save');
 const pageSaveApplyBtn = document.getElementById('page-save-apply');
 const pageDeleteBtn = document.getElementById('page-delete');
 const pageNewBtn = document.getElementById('page-new');
 const pageReorderApplyBtn = document.getElementById('page-reorder-apply');
 const pageEditorStatus = document.getElementById('page-editor-status');
+
+let draggedPageOrderItem = null;
 
 let latestConfig = null;
 
@@ -468,6 +486,7 @@ function renderPageEditorOptions() {
     pageEditorSelect.appendChild(option);
   }
   pageOrderInput.value = pages.map((page) => page.page_id).join(', ');
+  renderPageOrderList(pages.map((page) => page.page_id));
   if (pages.length === 0) {
     return;
   }
@@ -476,13 +495,71 @@ function renderPageEditorOptions() {
   renderSelectedPage();
 }
 
+function createPageOrderListItem(pageId) {
+  const item = document.createElement('li');
+  item.className = 'order-item';
+  item.draggable = true;
+  item.dataset.pageId = pageId;
+  item.innerHTML = `<span class="drag-handle" aria-hidden="true">::</span><span>${pageId}</span>`;
+
+  item.addEventListener('dragstart', () => {
+    draggedPageOrderItem = item;
+    item.classList.add('dragging');
+  });
+
+  item.addEventListener('dragend', () => {
+    item.classList.remove('dragging');
+    draggedPageOrderItem = null;
+    syncPageOrderInputFromList();
+  });
+
+  item.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    if (!draggedPageOrderItem || draggedPageOrderItem === item) {
+      return;
+    }
+    const rect = item.getBoundingClientRect();
+    const insertBefore = event.clientY < rect.top + rect.height / 2;
+    if (insertBefore) {
+      pageOrderList.insertBefore(draggedPageOrderItem, item);
+    } else {
+      pageOrderList.insertBefore(draggedPageOrderItem, item.nextSibling);
+    }
+  });
+
+  return item;
+}
+
+function renderPageOrderList(pageIds) {
+  pageOrderList.innerHTML = '';
+  for (const pageId of pageIds) {
+    pageOrderList.appendChild(createPageOrderListItem(pageId));
+  }
+}
+
+function getPageOrderFromList() {
+  return Array.from(pageOrderList.querySelectorAll('.order-item')).map((item) => item.dataset.pageId || '').filter(Boolean);
+}
+
+function syncPageOrderInputFromList() {
+  const ids = getPageOrderFromList();
+  pageOrderInput.value = ids.join(', ');
+}
+
 function renderSelectedPage() {
   const pageId = pageEditorSelect.value;
   const page = (latestConfig?.pages || []).find((entry) => entry.page_id === pageId);
   if (!page) {
     return;
   }
+  if (page.layout && !Array.from(pageLayoutInput.options).some((option) => option.value === page.layout)) {
+    const option = document.createElement('option');
+    option.value = page.layout;
+    option.textContent = page.layout;
+    pageLayoutInput.appendChild(option);
+  }
   pageIdInput.value = page.page_id || '';
+  pageEnabledInput.checked = Boolean(page.enabled ?? true);
   pageNameInput.value = page.name || '';
   pageLayoutInput.value = page.layout || '';
   pageDurationInput.value = String(page.duration_seconds ?? 8);
@@ -491,6 +568,7 @@ function renderSelectedPage() {
 }
 
 function clearPageEditor() {
+  pageEnabledInput.checked = true;
   pageIdInput.value = '';
   pageNameInput.value = '';
   pageLayoutInput.value = 'single_kpi';
@@ -509,6 +587,7 @@ async function savePage(applyAfterSave) {
     const payload = {
       page: {
         page_id: pageId,
+        enabled: pageEnabledInput.checked,
         name: pageNameInput.value.trim() || pageId,
         layout: pageLayoutInput.value.trim() || 'single_kpi',
         widgets: parseCommaList(pageWidgetsInput.value),
@@ -561,7 +640,8 @@ async function deleteSelectedPage() {
 
 async function reorderPagesAndApply() {
   try {
-    const ids = parseCommaList(pageOrderInput.value);
+    const listIds = getPageOrderFromList();
+    const ids = listIds.length > 0 ? listIds : parseCommaList(pageOrderInput.value);
     const response = await fetch('/api/config/pages/reorder', {
       method: 'POST',
       headers: {'content-type': 'application/json'},
@@ -737,6 +817,12 @@ pageSaveApplyBtn.addEventListener('click', () => savePage(true));
 pageDeleteBtn.addEventListener('click', deleteSelectedPage);
 pageNewBtn.addEventListener('click', clearPageEditor);
 pageReorderApplyBtn.addEventListener('click', reorderPagesAndApply);
+pageOrderInput.addEventListener('change', () => {
+  const ids = parseCommaList(pageOrderInput.value);
+  if (ids.length > 0) {
+    renderPageOrderList(ids);
+  }
+});
 
 Promise.all([loadConfigEditors(), refreshDashboard()]).catch((error) => {
   console.error(error);

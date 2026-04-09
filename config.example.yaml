@@ -209,26 +209,31 @@ widgets:
 pages:
   - page_id: overview
     name: Overview
+    enabled: true
     layout: two_column
     widgets: [clock, weather]
     duration_seconds: 8
   - page_id: markets
     name: Markets
+    enabled: true
     layout: two_column
     widgets: [stocks, markets]
     duration_seconds: 8
   - page_id: derivatives
     name: Derivatives
+    enabled: true
     layout: two_column
     widgets: [futures, crypto]
     duration_seconds: 8
   - page_id: ticker
     name: Ticker
+    enabled: true
     layout: ticker_only
     widgets: [news]
     duration_seconds: 10
   - page_id: alerts
     name: Alerts
+    enabled: true
     layout: alert_fullscreen
     widgets: [custom_text]
     duration_seconds: 6

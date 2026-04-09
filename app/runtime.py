@@ -35,9 +35,16 @@ class DashboardRuntime:
         self.renderer = self._build_renderer()
         self._render_task: asyncio.Task[None] | None = None
         self._running = False
+        self._manual_brightness: int | None = None
         self._last_frame = RenderFrame(width=config.panel.width, height=config.panel.height, page_id=self.pages[0].page_id)
 
-    def _rebuild_components(self, config: DashboardConfig, *, previous_state: AppState | None = None) -> None:
+    def _rebuild_components(
+        self,
+        config: DashboardConfig,
+        *,
+        previous_state: AppState | None = None,
+        previous_manual_brightness: int | None = None,
+    ) -> None:
         self.config = config
         next_state = AppState(mode=config.renderer.mode)
         if previous_state is not None:
@@ -54,14 +61,22 @@ class DashboardRuntime:
         self.cache = TTLCache()
         self.scheduler = WidgetScheduler(self.widgets, self.cache, self.state.widget_status)
         self.renderer = self._build_renderer()
+        self._manual_brightness = previous_manual_brightness
+        if self._manual_brightness is not None:
+            self._apply_brightness(self._manual_brightness)
         self._last_frame = RenderFrame(width=config.panel.width, height=config.panel.height, page_id=self.pages[0].page_id)
 
     async def apply_config(self, config: DashboardConfig) -> None:
         was_running = self.state.running
         previous_state = self.state.model_copy(deep=True)
+        previous_manual_brightness = self._manual_brightness
         if was_running:
             await self.stop()
-        self._rebuild_components(config, previous_state=previous_state)
+        self._rebuild_components(
+            config,
+            previous_state=previous_state,
+            previous_manual_brightness=previous_manual_brightness,
+        )
         if was_running:
             await self.start()
 
@@ -106,7 +121,10 @@ class DashboardRuntime:
     async def _render_loop(self) -> None:
         while self._running:
             self.state.widget_data = dict(self.scheduler.data)
-            self.set_brightness(self._schedule_brightness())
+            if self._manual_brightness is None:
+                self._apply_brightness(self._schedule_brightness())
+            else:
+                self._apply_brightness(self._manual_brightness)
             page = self.rotation.tick(self.state.pinned_page_id)
             self.state.current_page_id = page.page_id
             image = self.layout.render_page(page=page, data_map=self.state.widget_data, override=self.state.override_message)
@@ -127,6 +145,10 @@ class DashboardRuntime:
         self.state.pinned_page_id = page_id
 
     def set_brightness(self, brightness: int) -> None:
+        self._manual_brightness = max(1, min(100, brightness))
+        self._apply_brightness(self._manual_brightness)
+
+    def _apply_brightness(self, brightness: int) -> None:
         self.state.brightness = max(1, min(100, brightness))
         self.renderer.set_brightness(self.state.brightness)
 

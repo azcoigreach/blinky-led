@@ -1,0 +1,321 @@
+panel:
+  width: 128
+  height: 32
+renderer:
+  mode: piomatter
+  hardware_mapping: adafruit-hat
+  n_addr_lines: 4
+api:
+  host: 0.0.0.0
+  port: 8080
+schedule:
+  day_brightness: 70
+  night_brightness: 25
+  day_start_hour: 7
+  night_start_hour: 22
+providers:
+  stocks:
+    enabled: true
+    primary: finnhub
+    fallback: alphavantage
+    refresh_seconds: 60
+    stale_after_seconds: 180
+    symbols:
+    - AAPL
+    - TSLA
+    - NVDA
+    - SPY
+    - QQQ
+    labels:
+      SPY: S&P
+      QQQ: NASDAQ
+    aliases: {}
+    config:
+      fixture_price: 510.33
+      fixture_percent_change: -0.24
+  markets:
+    enabled: true
+    provider: proxy_etf
+    refresh_seconds: 60
+    stale_after_seconds: 180
+    symbols:
+    - DIA
+    - QQQ
+    - SPY
+    - IWM
+    labels:
+      DIA: DOW
+      QQQ: NASDAQ
+      SPY: S&P
+      IWM: RUSSELL
+    aliases: {}
+    config: {}
+  futures:
+    enabled: true
+    provider: yahoo
+    refresh_seconds: 120
+    stale_after_seconds: 300
+    symbols:
+    - ES
+    - NQ
+    - YM
+    - CL
+    - GC
+    labels: {}
+    aliases:
+      ES: ES=F
+      NQ: NQ=F
+      YM: YM=F
+      CL: CL=F
+      GC: GC=F
+    config: {}
+  crypto:
+    enabled: true
+    provider: coingecko
+    refresh_seconds: 90
+    stale_after_seconds: 240
+    symbols:
+    - BTC
+    - ETH
+    - SOL
+    - DOGE
+    labels: {}
+    aliases:
+      BTC: bitcoin
+      ETH: ethereum
+      SOL: solana
+      DOGE: dogecoin
+    config: {}
+widgets:
+  clock:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 1
+    ttl_seconds: 2
+    retries: 1
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config: {}
+  weather:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 120
+    ttl_seconds: 300
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      city: New York
+      fixture_temp: 18
+  stocks:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 60
+    ttl_seconds: 120
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      display_mode: full
+      layout: list
+      symbols:
+      - SPY
+      - QQQ
+      primary: fixture
+      fallback: ''
+      symbol: SPY
+      fixture_price: 510.33
+      fixture_percent_change: -0.24
+  markets:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 90
+    ttl_seconds: 180
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      layout: compact
+      symbols:
+      - DIA
+      - QQQ
+      - SPY
+      - IWM
+      labels:
+        DIA: DOW
+        QQQ: NASDAQ
+        SPY: S&P
+        IWM: RUSSELL
+  futures:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 3600
+    ttl_seconds: 300
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      provider: yahoo
+      display_mode: percent_only
+      symbols:
+      - ES
+      - NQ
+      - YM
+      - CL
+      aliases:
+        ES: ES=F
+        NQ: NQ=F
+        YM: YM=F
+        CL: CL=F
+  crypto:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 60
+    ttl_seconds: 120
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      provider: coingecko
+      symbols:
+      - BTC
+      - ETH
+      - SOL
+      display_mode: full
+      aliases:
+        BTC: bitcoin
+        ETH: ethereum
+        SOL: solana
+      fixture_price: 68000
+      fixture_change_percent: 1.2
+  gas:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 3600
+    ttl_seconds: 7200
+    retries: 1
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      provider: fixture
+      region: AZ
+      fixture_price: 3.99
+      manual_price: 3.89
+      endpoint: https://gasprices.aaa.com/wp-admin/admin-ajax.php
+  news:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 120
+    ttl_seconds: 300
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      provider: fixture
+      feed_url: https://feeds.reuters.com/reuters/businessNews
+      query: markets
+      fixture_headlines:
+      - Blinky v3 simulator is running
+      - Use /api/override for urgent alerts
+  poll:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 300
+    ttl_seconds: 600
+    retries: 2
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      provider: fixture
+      candidate: Candidate A
+      fixture_percent: 48.2
+      endpoint: ''
+  system:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 5
+    ttl_seconds: 10
+    retries: 1
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config: {}
+  custom_text:
+    enabled: true
+    run_mode: background_always
+    refresh_seconds: 300
+    ttl_seconds: 600
+    retries: 1
+    retry_backoff_seconds: 0.4
+    fallback_policy: last_known_or_synthetic
+    config:
+      message: Blinky online
+pages:
+- page_id: civic
+  name: Civic
+  layout: split_banner
+  enabled: true
+  widgets:
+  - gas
+  - poll
+  duration_seconds: 8
+  pinned: false
+- page_id: overview
+  name: Overview
+  layout: two_column
+  enabled: true
+  widgets:
+  - clock
+  - weather
+  duration_seconds: 8
+  pinned: false
+- page_id: equities
+  name: Equities
+  layout: two_column
+  enabled: true
+  widgets:
+  - stocks
+  - markets
+  duration_seconds: 8
+  pinned: false
+- page_id: derivatives
+  name: Derivatives
+  layout: two_column
+  enabled: true
+  widgets:
+  - futures
+  - crypto
+  duration_seconds: 8
+  pinned: false
+- page_id: test
+  name: Testing Page
+  layout: single_kpi
+  enabled: false
+  widgets:
+  - clock
+  duration_seconds: 8
+  pinned: false
+- page_id: system
+  name: System
+  layout: two_column
+  enabled: true
+  widgets:
+  - system
+  - custom_text
+  duration_seconds: 8
+  pinned: false
+- page_id: headlines
+  name: Headlines
+  layout: ticker_only
+  enabled: true
+  widgets:
+  - news
+  duration_seconds: 8
+  pinned: false
+- page_id: ticker
+  name: Alerts
+  layout: alert_fullscreen
+  enabled: true
+  widgets:
+  - custom_text
+  duration_seconds: 6
+  pinned: false

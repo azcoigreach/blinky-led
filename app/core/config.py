@@ -42,7 +42,6 @@ class ScheduleConfig(BaseModel):
 
 class WidgetConfig(BaseModel):
     enabled: bool = True
-    run_mode: Literal["background_always", "page_bound"] = "background_always"
     refresh_seconds: int = 60
     ttl_seconds: int = 180
     retries: int = 2

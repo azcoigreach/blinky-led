@@ -39,18 +39,22 @@ class PiomatterRenderer(Renderer):
             framebuffer=self._framebuffer,
             geometry=geometry,
         )
+        self._brightness = 100
         self._last_image = Image.new("RGB", (width, height), (0, 0, 0))
 
     def draw_frame(self, image: Image.Image) -> None:
         arr = np.asarray(image.resize((self.width, self.height)))
+        if self._brightness < 100:
+            scale = self._brightness / 100.0
+            arr = np.clip(arr.astype(np.float32) * scale, 0, 255).astype(np.uint8)
         self._framebuffer[:] = arr
         self._last_image = image.copy()
         self._matrix.show()
 
     def set_brightness(self, brightness: int) -> None:
-        # Piomatter currently has no stable global brightness API.
-        # Stored for UI/reporting and future support.
-        _ = max(1, min(100, brightness))
+        # Piomatter has no stable global brightness API in this version,
+        # so apply software dimming during frame copy.
+        self._brightness = max(1, min(100, brightness))
 
     def get_last_image(self) -> Image.Image:
         return self._last_image

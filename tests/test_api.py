@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from click.testing import CliRunner
+import time
 
 from app.cli import cli
 from app.core.config import DashboardConfig
@@ -76,6 +77,11 @@ def test_api_brightness_valid_and_invalid_range() -> None:
         valid = client.post("/api/brightness", json={"brightness": 42})
         assert valid.status_code == 200
         assert valid.json() == {"ok": True, "brightness": 42}
+
+        time.sleep(0.25)
+        status = client.get("/api/status")
+        assert status.status_code == 200
+        assert status.json()["brightness"] == 42
 
         invalid = client.post("/api/brightness", json={"brightness": 101})
         assert invalid.status_code == 422
