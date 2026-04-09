@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from app.providers.base import GasPrice, ProviderResultMeta
-from app.services.http import fetch_json
+from app.services.http import post_form_json
 
 
 class GasProvider(Protocol):
@@ -40,19 +40,44 @@ class ManualGasProvider:
 
 
 class AaaGasProvider:
-    """Adapter-ready provider for future AAA integration."""
+    """AAA gas provider via gasprices.aaa.com WordPress AJAX endpoint."""
 
     def __init__(self, *, endpoint: str, region: str, source_label: str = "aaa") -> None:
         self.endpoint = endpoint
-        self.region = region
+        self.region = region.upper()
         self.source_label = source_label
 
     async def fetch_gas_price(self) -> GasPrice:
-        payload = await fetch_json(self.endpoint, params={"region": self.region})
+        payload = await post_form_json(
+            self.endpoint,
+            data={
+                "action": "states_cost_data",
+                "data[locL]": self.region,
+                "data[locR]": "US",
+            },
+            headers={
+                "Accept": "application/json, text/javascript, */*; q=0.01",
+                "Origin": "https://gasprices.aaa.com",
+                "Referer": "https://gasprices.aaa.com/",
+                "User-Agent": "Mozilla/5.0",
+            },
+        )
+        if not bool(payload.get("success")):
+            raise RuntimeError("aaa gas provider returned unsuccessful response")
+        data = payload.get("data")
+        if not isinstance(data, dict):
+            raise RuntimeError("aaa gas provider returned unexpected payload shape")
+        unleaded = data.get("unleaded")
+        if not isinstance(unleaded, list) or not unleaded:
+            raise RuntimeError("aaa gas provider response missing unleaded prices")
+
         return GasPrice(
-            usd_per_gallon=float(payload.get("usd_per_gallon", 0.0)),
-            region=str(payload.get("region", self.region)),
-            meta=ProviderResultMeta(source_label=self.source_label, debug={"endpoint": self.endpoint}),
+            usd_per_gallon=float(unleaded[0]),
+            region=self.region,
+            meta=ProviderResultMeta(
+                source_label=self.source_label,
+                debug={"endpoint": self.endpoint, "action": "states_cost_data"},
+            ),
         )
 
 
@@ -66,9 +91,7 @@ def build_gas_provider(config: dict, *, source_label: str) -> GasProvider:
             source_label=source_label or "manual-gas",
         )
     if provider_name == "aaa":
-        endpoint = str(config.get("endpoint", "")).strip()
-        if not endpoint:
-            raise RuntimeError("aaa gas provider requires config.endpoint")
+        endpoint = str(config.get("endpoint", "https://gasprices.aaa.com/wp-admin/admin-ajax.php")).strip()
         return AaaGasProvider(endpoint=endpoint, region=region, source_label=source_label or "aaa")
     return FixtureGasProvider(
         usd_per_gallon=float(config.get("fixture_price", 3.89)),

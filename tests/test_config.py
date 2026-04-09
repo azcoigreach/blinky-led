@@ -56,3 +56,36 @@ pages:
     )
     conf = load_config(cfg)
     assert conf.renderer.mode == "piomatter"
+
+
+def test_provider_family_config_loads(tmp_path: Path) -> None:
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(
+        """
+providers:
+  stocks:
+    enabled: true
+    primary: finnhub
+    fallback: alphavantage
+    symbols: [AAPL, SPY]
+    labels:
+      SPY: S&P
+widgets:
+  stocks:
+    enabled: true
+    refresh_seconds: 60
+    ttl_seconds: 180
+    retries: 1
+    config: {}
+pages:
+  - page_id: p1
+    name: P1
+    layout: single_kpi
+    widgets: [stocks]
+""".strip(),
+        encoding="utf-8",
+    )
+    conf = load_config(cfg)
+    assert conf.providers.stocks.primary == "finnhub"
+    assert conf.providers.stocks.fallback == "alphavantage"
+    assert conf.providers.stocks.symbols == ["AAPL", "SPY"]

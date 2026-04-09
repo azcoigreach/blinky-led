@@ -12,6 +12,8 @@ class SecretSettings(BaseModel):
     news_api_key: str | None = Field(default=None, alias="NEWS_API_KEY")
     stocks_api_key: str | None = Field(default=None, alias="STOCKS_API_KEY")
     poll_api_key: str | None = Field(default=None, alias="POLL_API_KEY")
+    finnhub_api_key: str | None = Field(default=None, alias="FINNHUB_API_KEY")
+    alphavantage_api_key: str | None = Field(default=None, alias="ALPHAVANTAGE_API_KEY")
 
 
 def load_secrets(env_path: Path) -> SecretSettings:
@@ -22,5 +24,7 @@ def load_secrets(env_path: Path) -> SecretSettings:
         "NEWS_API_KEY": os.getenv("NEWS_API_KEY"),
         "STOCKS_API_KEY": os.getenv("STOCKS_API_KEY"),
         "POLL_API_KEY": os.getenv("POLL_API_KEY"),
+        "FINNHUB_API_KEY": os.getenv("FINNHUB_API_KEY"),
+        "ALPHAVANTAGE_API_KEY": os.getenv("ALPHAVANTAGE_API_KEY"),
     }
     return SecretSettings.model_validate(values)

@@ -51,6 +51,27 @@ class WidgetConfig(BaseModel):
     config: dict[str, Any] = Field(default_factory=dict)
 
 
+class ProviderFamilyConfig(BaseModel):
+    enabled: bool = True
+    provider: str | None = None
+    primary: str | None = None
+    fallback: str | None = None
+    refresh_seconds: int | None = None
+    stale_after_seconds: int | None = None
+    symbols: list[str] = Field(default_factory=list)
+    labels: dict[str, str] = Field(default_factory=dict)
+    aliases: dict[str, str] = Field(default_factory=dict)
+    api_key_env: str | None = None
+    config: dict[str, Any] = Field(default_factory=dict)
+
+
+class ProvidersConfig(BaseModel):
+    stocks: ProviderFamilyConfig = Field(default_factory=ProviderFamilyConfig)
+    markets: ProviderFamilyConfig = Field(default_factory=ProviderFamilyConfig)
+    futures: ProviderFamilyConfig = Field(default_factory=ProviderFamilyConfig)
+    crypto: ProviderFamilyConfig = Field(default_factory=ProviderFamilyConfig)
+
+
 class PageConfig(BaseModel):
     page_id: str
     name: str
@@ -66,6 +87,7 @@ class DashboardConfig(BaseModel):
     renderer: RendererConfig = Field(default_factory=RendererConfig)
     api: ApiConfig = Field(default_factory=ApiConfig)
     schedule: ScheduleConfig = Field(default_factory=ScheduleConfig)
+    providers: ProvidersConfig = Field(default_factory=ProvidersConfig)
     widgets: dict[str, WidgetConfig] = Field(default_factory=dict)
     pages: list[PageConfig] = Field(default_factory=list)
 

@@ -3,7 +3,9 @@ import pytest
 from app.core.models import DataOrigin, Freshness, HealthState, Severity
 from app.widgets.base import Widget
 from app.widgets.clock import ClockWidget
+from app.widgets.crypto import CryptoWidget
 from app.widgets.custom_text import CustomTextWidget
+from app.widgets.stocks import StocksWidget
 from app.widgets.system import SystemWidget
 
 
@@ -125,3 +127,42 @@ async def test_status_fields_updated_on_failure() -> None:
     assert status.last_error_message == "boom"
     assert status.retry_count_used == 0
     assert status.attempts_made == 1
+
+
+@pytest.mark.asyncio
+async def test_stocks_widget_outputs_render_friendly_items() -> None:
+    widget = StocksWidget(
+        "stocks",
+        config={
+            "primary": "fixture",
+            "symbols": ["AAPL", "SPY"],
+            "labels": {"SPY": "S&P"},
+            "fixture_price": 210.0,
+            "fixture_percent_change": -1.2,
+        },
+    )
+    data = await widget.fetch_primary()
+    assert data.title == "Stocks"
+    assert len(data.extra["items"]) == 2
+    assert data.extra["items"][1]["label"] == "S&P"
+    assert "AAPL" in data.value
+
+
+@pytest.mark.asyncio
+async def test_crypto_widget_percent_only_layout() -> None:
+    widget = CryptoWidget(
+        "crypto",
+        config={
+            "provider": "fixture",
+            "symbols": ["BTC", "ETH"],
+            "fixture_price": 67000,
+            "fixture_change_percent": 1.5,
+            "display_mode": "percent_only",
+        },
+        source_label="fixture-crypto",
+    )
+    data = await widget.fetch_primary()
+    assert data.title == "Crypto"
+    assert len(data.extra["items"]) == 2
+    assert "BTC" in data.value
+    assert "+1.50%" in data.value

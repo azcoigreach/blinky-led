@@ -1,37 +1,87 @@
 from __future__ import annotations
 
+from app.core.market_data import StockQuoteNormalized
 from app.core.models import Severity
-from app.providers.markets import build_market_provider
+from app.providers.stocks import build_stock_provider_pair
+from app.services.market_data import MarketDataService, StocksDataSource
 from app.widgets.base import Widget
 
 
 class StocksWidget(Widget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.provider = build_market_provider(self.config, source_label=self.source_label)
+        providers_cfg = self.config.get("providers", self.config)
+        primary, fallback = build_stock_provider_pair(providers_cfg, source_label=self.source_label)
+        self.data_source = StocksDataSource(primary=primary, fallback=fallback)
+        self.service: MarketDataService[StockQuoteNormalized] = MarketDataService(
+            refresh_seconds=int(self.config.get("refresh_seconds", self.refresh_seconds)),
+            stale_after_seconds=int(self.config.get("stale_after_seconds", self.ttl_seconds)),
+            retry_attempts=int(self.config.get("provider_retry_attempts", 2)),
+            retry_backoff_seconds=float(self.config.get("provider_retry_backoff_seconds", 0.25)),
+        )
 
     async def fetch_primary(self):
-        symbol = self.config.get("symbol", "SPY")
-        market_type = str(self.config.get("market_type", "stock"))
-        quote = await self.provider.fetch_quote(symbol, market_type=market_type)
-        price = quote.price
-        delta = quote.change_percent
-        sev = Severity.warning if delta < -1 else Severity.ok
-        trend = "down" if delta < 0 else "up" if delta > 0 else "flat"
+        symbols = [str(symbol).upper() for symbol in self.config.get("symbols", [self.config.get("symbol", "SPY")]) if symbol]
+        if not symbols:
+            return self.normalized(
+                "Stocks",
+                "disabled",
+                severity=Severity.info,
+                status_summary="stocks widget disabled by empty symbols",
+                extra={"items": []},
+                source_label=self.source_label,
+            )
+
+        labels = {str(k).upper(): str(v) for k, v in dict(self.config.get("labels", {})).items()}
+        batch = await self.service.get_or_refresh(
+            fetcher=lambda: self.data_source.fetch(symbols, labels=labels),
+            source=self.source_label,
+        )
+
+        items = [_format_item(quote) for quote in batch.items]
+        display_mode = str(self.config.get("display_mode", "full")).lower()
+        value = _render_value(items, display_mode=display_mode)
+        lead = batch.items[0]
+        delta = f"{lead.percent_change:+.2f}%"
+        trend = "down" if lead.percent_change < 0 else "up" if lead.percent_change > 0 else "flat"
+        worst_percent = min((quote.percent_change for quote in batch.items), default=0.0)
+        sev = Severity.warning if worst_percent < -1.5 else Severity.ok
+
         return self.normalized(
             "Stocks",
-            f"{symbol} {price:.2f}",
-            delta=f"{delta:+.2f}%",
+            value,
+            delta=delta,
             trend=trend,
             severity=sev,
-            source_label=quote.meta.source_label,
-            status_summary=f"{market_type} quote loaded",
+            source_label=batch.source,
+            status_summary=f"{len(batch.items)} stock quote(s) loaded",
             extra={
-                "symbol": quote.symbol,
-                "price": price,
-                "delta_percent": delta,
-                "market_type": quote.market_type,
-                "provider_fetched_at": quote.meta.fetched_at.isoformat(),
+                "layout": str(self.config.get("layout", "list")),
+                "display_mode": display_mode,
+                "items": items,
+                "updated_at": batch.updated_at.isoformat(),
+                "service_stale": self.service.is_stale(),
             },
-            debug=quote.meta.debug,
+            debug={"symbols": symbols, "provider_error": self.service.last_error},
         )
+
+
+def _format_item(quote: StockQuoteNormalized) -> dict[str, object]:
+    trend = "down" if quote.percent_change < 0 else "up" if quote.percent_change > 0 else "flat"
+    return {
+        "symbol": quote.symbol,
+        "label": quote.label,
+        "value": f"{quote.price:.2f}",
+        "delta": f"{quote.percent_change:+.2f}%",
+        "trend": trend,
+        "stale": quote.stale,
+        "source": quote.source,
+    }
+
+
+def _render_value(items: list[dict[str, object]], *, display_mode: str) -> str:
+    if not items:
+        return "n/a"
+    if display_mode == "percent_only":
+        return " ".join(f"{item['label']} {item['delta']}" for item in items[:2])
+    return " | ".join(f"{item['label']} {item['value']} {item['delta']}" for item in items[:2])

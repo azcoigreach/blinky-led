@@ -27,6 +27,8 @@ Starter widgets:
 - `clock`
 - `weather`
 - `stocks`
+- `markets`
+- `futures`
 - `crypto`
 - `gas`
 - `news`
@@ -123,12 +125,43 @@ External-source widgets use provider classes selected by widget config (`widgets
 Provider families:
 
 - News: `fixture`, `rss`, `newsapi`
-- Crypto: `binance`, `coingecko`, `fixture`
-- Stocks/Futures: `fixture`, `marketdata` (adapter-ready)
+- Stocks: `finnhub` (primary), `alphavantage` (fallback), `fixture`
+- Markets (ETF proxies): `proxy_etf` using `DIA`, `QQQ`, `SPY`, `IWM`
+- Futures: `yahoo` (provisional, symbol coverage can vary by contract and region)
+- Crypto: `coingecko`, `fixture`
 - Poll: `fixture`, `external` (adapter-ready)
-- Gas: `fixture`, `manual`, `aaa` (adapter-ready)
+- Gas: `fixture`, `manual`, `aaa`
 
 This keeps widget code extensible and avoids source-specific HTTP logic leaking into display components.
+
+### Market Data v3 Notes
+
+- Widgets consume normalized internal models only; they never depend on third-party response JSON shape.
+- `markets` intentionally uses ETF proxies instead of licensed index feeds.
+- `futures` support is explicit but provisional. Provider swap is isolated behind `FuturesQuoteProvider`.
+- Service orchestration (`app/services/market_data.py`) handles refresh cadence, retries with backoff, stale marking, and cache reuse.
+- API keys are read from `.env` (`FINNHUB_API_KEY`, `ALPHAVANTAGE_API_KEY`) and not from YAML.
+
+Example provider configuration:
+
+```yaml
+providers:
+  stocks:
+    primary: finnhub
+    fallback: alphavantage
+    refresh_seconds: 60
+    stale_after_seconds: 180
+    symbols: [AAPL, TSLA, NVDA, SPY, QQQ]
+  markets:
+    provider: proxy_etf
+    symbols: [DIA, QQQ, SPY, IWM]
+  futures:
+    provider: yahoo
+    symbols: [ES, NQ, YM, CL, GC]
+  crypto:
+    provider: coingecko
+    symbols: [BTC, ETH, SOL, DOGE]
+```
 
 ## Web UI Controls
 

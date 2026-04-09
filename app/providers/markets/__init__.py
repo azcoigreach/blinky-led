@@ -1,17 +1,15 @@
-from __future__ import annotations
-
-from typing import Protocol
-
+from app.providers.markets.base import MarketOverviewProvider
+from app.providers.markets.proxy_etf import ProxyEtfMarketProvider
 from app.providers.base import MarketQuote, ProviderResultMeta
 from app.services.http import fetch_json
 
 
-class MarketProvider(Protocol):
+class MarketProvider:
     async def fetch_quote(self, symbol: str, *, market_type: str) -> MarketQuote:
-        ...
+        raise NotImplementedError
 
 
-class FixtureMarketProvider:
+class FixtureMarketProvider(MarketProvider):
     def __init__(self, *, price: float, change_percent: float, source_label: str = "fixture-market") -> None:
         self.price = price
         self.change_percent = change_percent
@@ -27,9 +25,7 @@ class FixtureMarketProvider:
         )
 
 
-class MarketDataProvider:
-    """Adapter-ready HTTP provider. The endpoint shape is intentionally configurable."""
-
+class MarketDataProvider(MarketProvider):
     def __init__(self, *, endpoint: str, source_label: str = "market-api") -> None:
         self.endpoint = endpoint
         self.source_label = source_label
@@ -57,3 +53,12 @@ def build_market_provider(config: dict, *, source_label: str) -> MarketProvider:
         change_percent=float(config.get("fixture_delta", 0.0)),
         source_label=source_label or "fixture-market",
     )
+
+__all__ = [
+    "FixtureMarketProvider",
+    "MarketDataProvider",
+    "MarketOverviewProvider",
+    "MarketProvider",
+    "ProxyEtfMarketProvider",
+    "build_market_provider",
+]
