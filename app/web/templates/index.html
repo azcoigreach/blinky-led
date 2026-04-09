@@ -55,6 +55,10 @@
         <thead>
           <tr>
             <th>Widget</th>
+            <th>Active</th>
+            <th>Run Mode</th>
+            <th>Assigned Pages</th>
+            <th>Visible Now</th>
             <th>Health</th>
             <th>Freshness</th>
             <th>Source</th>
@@ -76,6 +80,116 @@
         {% endfor %}
       </ul>
     </section>
+
+    <section class="panel">
+      <h2>Widget Config</h2>
+      <p class="small">Edits include plain-text tokens/API settings inside config JSON.</p>
+      <div class="control-row">
+        <label for="widget-editor-select">Widget</label>
+        <select id="widget-editor-select"></select>
+      </div>
+      <div class="form-grid">
+        <label><input id="widget-enabled" type="checkbox" /> Enabled</label>
+        <label for="widget-run-mode">Run mode</label>
+        <select id="widget-run-mode">
+          <option value="background_always">background_always</option>
+          <option value="page_bound">page_bound</option>
+        </select>
+        <label for="widget-refresh">Refresh (sec)</label>
+        <input id="widget-refresh" type="number" min="1" />
+        <label for="widget-ttl">TTL (sec)</label>
+        <input id="widget-ttl" type="number" min="1" />
+        <label for="widget-retries">Retries</label>
+        <input id="widget-retries" type="number" min="0" />
+        <label for="widget-backoff">Retry backoff</label>
+        <input id="widget-backoff" type="number" min="0" step="0.1" />
+        <label for="widget-source-label">Source label</label>
+        <input id="widget-source-label" type="text" />
+      </div>
+      <label for="widget-config-json">Widget config JSON</label>
+      <textarea id="widget-config-json" rows="8"></textarea>
+      <div class="button-row">
+        <button id="widget-save" type="button">Save Widget</button>
+        <button id="widget-save-apply" type="button">Save + Apply</button>
+      </div>
+      <p class="small" id="widget-editor-status">Widget editor ready.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Provider Config</h2>
+      <p class="small">Use plain text for tokens/keys per your local-network setup.</p>
+      <div class="control-row">
+        <label for="provider-editor-select">Provider family</label>
+        <select id="provider-editor-select">
+          <option value="stocks">stocks</option>
+          <option value="markets">markets</option>
+          <option value="futures">futures</option>
+          <option value="crypto">crypto</option>
+        </select>
+      </div>
+      <div class="form-grid">
+        <label><input id="provider-enabled" type="checkbox" /> Enabled</label>
+        <label for="provider-primary">Primary</label>
+        <input id="provider-primary" type="text" />
+        <label for="provider-fallback">Fallback</label>
+        <input id="provider-fallback" type="text" />
+        <label for="provider-name">Provider</label>
+        <input id="provider-name" type="text" />
+        <label for="provider-api-key-env">API key env</label>
+        <input id="provider-api-key-env" type="text" />
+        <label for="provider-refresh">Refresh (sec)</label>
+        <input id="provider-refresh" type="number" min="1" />
+        <label for="provider-stale">Stale after (sec)</label>
+        <input id="provider-stale" type="number" min="1" />
+        <label for="provider-symbols">Symbols (comma)</label>
+        <input id="provider-symbols" type="text" />
+      </div>
+      <label for="provider-labels-json">Labels JSON</label>
+      <textarea id="provider-labels-json" rows="4"></textarea>
+      <label for="provider-aliases-json">Aliases JSON</label>
+      <textarea id="provider-aliases-json" rows="4"></textarea>
+      <label for="provider-config-json">Provider config JSON (tokens, URLs, endpoints)</label>
+      <textarea id="provider-config-json" rows="8"></textarea>
+      <div class="button-row">
+        <button id="provider-save" type="button">Save Provider</button>
+        <button id="provider-save-apply" type="button">Save + Apply</button>
+      </div>
+      <p class="small" id="provider-editor-status">Provider editor ready.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Page Builder</h2>
+      <div class="control-row">
+        <label for="page-editor-select">Existing page</label>
+        <select id="page-editor-select"></select>
+      </div>
+      <div class="form-grid">
+        <label for="page-id">Page ID</label>
+        <input id="page-id" type="text" />
+        <label for="page-name">Name</label>
+        <input id="page-name" type="text" />
+        <label for="page-layout">Layout / Type</label>
+        <input id="page-layout" type="text" placeholder="single_kpi, two_column, ticker_only..." />
+        <label for="page-duration">Duration (sec)</label>
+        <input id="page-duration" type="number" min="1" />
+        <label for="page-widgets">Widgets (comma)</label>
+        <input id="page-widgets" type="text" />
+        <label for="page-ticker-widget">Ticker widget</label>
+        <input id="page-ticker-widget" type="text" />
+      </div>
+      <div class="button-row">
+        <button id="page-save" type="button">Save Page</button>
+        <button id="page-save-apply" type="button">Save + Apply</button>
+      </div>
+      <div class="button-row">
+        <button id="page-delete" type="button" class="secondary">Delete Page</button>
+        <button id="page-new" type="button" class="secondary">New Draft</button>
+      </div>
+      <label for="page-order">Page order (comma-separated page IDs)</label>
+      <input id="page-order" type="text" />
+      <button id="page-reorder-apply" type="button">Reorder + Apply</button>
+      <p class="small" id="page-editor-status">Page editor ready.</p>
+    </section>
   </main>
 <script>
 const REFRESH_MS = 5000;
@@ -92,6 +206,52 @@ const pinnedPageEl = document.getElementById('pinned-page');
 const brightnessValueEl = document.getElementById('brightness-value');
 const lastUpdatedEl = document.getElementById('last-updated');
 const widgetHealthBody = document.getElementById('widget-health-body');
+
+const widgetEditorSelect = document.getElementById('widget-editor-select');
+const widgetEnabledInput = document.getElementById('widget-enabled');
+const widgetRunModeInput = document.getElementById('widget-run-mode');
+const widgetRefreshInput = document.getElementById('widget-refresh');
+const widgetTtlInput = document.getElementById('widget-ttl');
+const widgetRetriesInput = document.getElementById('widget-retries');
+const widgetBackoffInput = document.getElementById('widget-backoff');
+const widgetSourceLabelInput = document.getElementById('widget-source-label');
+const widgetConfigJsonInput = document.getElementById('widget-config-json');
+const widgetSaveBtn = document.getElementById('widget-save');
+const widgetSaveApplyBtn = document.getElementById('widget-save-apply');
+const widgetEditorStatus = document.getElementById('widget-editor-status');
+
+const providerEditorSelect = document.getElementById('provider-editor-select');
+const providerEnabledInput = document.getElementById('provider-enabled');
+const providerPrimaryInput = document.getElementById('provider-primary');
+const providerFallbackInput = document.getElementById('provider-fallback');
+const providerNameInput = document.getElementById('provider-name');
+const providerApiKeyEnvInput = document.getElementById('provider-api-key-env');
+const providerRefreshInput = document.getElementById('provider-refresh');
+const providerStaleInput = document.getElementById('provider-stale');
+const providerSymbolsInput = document.getElementById('provider-symbols');
+const providerLabelsJsonInput = document.getElementById('provider-labels-json');
+const providerAliasesJsonInput = document.getElementById('provider-aliases-json');
+const providerConfigJsonInput = document.getElementById('provider-config-json');
+const providerSaveBtn = document.getElementById('provider-save');
+const providerSaveApplyBtn = document.getElementById('provider-save-apply');
+const providerEditorStatus = document.getElementById('provider-editor-status');
+
+const pageEditorSelect = document.getElementById('page-editor-select');
+const pageIdInput = document.getElementById('page-id');
+const pageNameInput = document.getElementById('page-name');
+const pageLayoutInput = document.getElementById('page-layout');
+const pageDurationInput = document.getElementById('page-duration');
+const pageWidgetsInput = document.getElementById('page-widgets');
+const pageTickerWidgetInput = document.getElementById('page-ticker-widget');
+const pageOrderInput = document.getElementById('page-order');
+const pageSaveBtn = document.getElementById('page-save');
+const pageSaveApplyBtn = document.getElementById('page-save-apply');
+const pageDeleteBtn = document.getElementById('page-delete');
+const pageNewBtn = document.getElementById('page-new');
+const pageReorderApplyBtn = document.getElementById('page-reorder-apply');
+const pageEditorStatus = document.getElementById('page-editor-status');
+
+let latestConfig = null;
 
 const pagesById = {};
 for (const option of pinPageSelect.options) {
@@ -114,6 +274,312 @@ function statusBadge(text, tone) {
   return `<span class="badge ${tone}">${text}</span>`;
 }
 
+function parseJsonOrThrow(text, fieldName) {
+  const raw = (text || '').trim();
+  if (!raw) {
+    return {};
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    throw new Error(`Invalid JSON in ${fieldName}`);
+  }
+}
+
+function toPrettyJson(value) {
+  return JSON.stringify(value || {}, null, 2);
+}
+
+function parseCommaList(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+}
+
+function setEditorStatus(el, text, isError = false) {
+  el.textContent = text;
+  el.classList.toggle('error-text', isError);
+}
+
+async function applyConfig(reloadRuntime = true) {
+  const response = await fetch('/api/config/apply', {
+    method: 'POST',
+    headers: {'content-type': 'application/json'},
+    body: JSON.stringify({reload_runtime: reloadRuntime}),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new Error(body.detail || 'Apply failed');
+  }
+}
+
+async function loadConfigEditors() {
+  const response = await fetch('/api/config');
+  if (!response.ok) {
+    throw new Error('Failed to load config');
+  }
+  const payload = await response.json();
+  latestConfig = payload.config || {};
+  renderWidgetEditorOptions();
+  renderProviderEditor();
+  renderPageEditorOptions();
+}
+
+function renderWidgetEditorOptions() {
+  const widgets = latestConfig?.widgets || {};
+  const widgetIds = Object.keys(widgets).sort();
+  const previous = widgetEditorSelect.value;
+  widgetEditorSelect.innerHTML = '';
+  for (const widgetId of widgetIds) {
+    const option = document.createElement('option');
+    option.value = widgetId;
+    option.textContent = widgetId;
+    widgetEditorSelect.appendChild(option);
+  }
+  if (widgetIds.length === 0) {
+    return;
+  }
+  widgetEditorSelect.value = widgetIds.includes(previous) ? previous : widgetIds[0];
+  renderSelectedWidget();
+}
+
+function renderSelectedWidget() {
+  const widgetId = widgetEditorSelect.value;
+  const widget = latestConfig?.widgets?.[widgetId];
+  if (!widget) {
+    return;
+  }
+  widgetEnabledInput.checked = Boolean(widget.enabled);
+  widgetRunModeInput.value = widget.run_mode || 'background_always';
+  widgetRefreshInput.value = String(widget.refresh_seconds ?? 60);
+  widgetTtlInput.value = String(widget.ttl_seconds ?? 180);
+  widgetRetriesInput.value = String(widget.retries ?? 2);
+  widgetBackoffInput.value = String(widget.retry_backoff_seconds ?? 0.4);
+  widgetSourceLabelInput.value = widget.source_label || '';
+  widgetConfigJsonInput.value = toPrettyJson(widget.config || {});
+}
+
+async function saveWidget(applyAfterSave) {
+  const widgetId = widgetEditorSelect.value;
+  if (!widgetId) {
+    return;
+  }
+  try {
+    const configObject = parseJsonOrThrow(widgetConfigJsonInput.value, 'widget config JSON');
+    const payload = {
+      widget: {
+        enabled: widgetEnabledInput.checked,
+        run_mode: widgetRunModeInput.value,
+        refresh_seconds: Number(widgetRefreshInput.value || 60),
+        ttl_seconds: Number(widgetTtlInput.value || 180),
+        retries: Number(widgetRetriesInput.value || 2),
+        retry_backoff_seconds: Number(widgetBackoffInput.value || 0.4),
+        fallback_policy: latestConfig.widgets?.[widgetId]?.fallback_policy || 'last_known_or_synthetic',
+        source_label: widgetSourceLabelInput.value || null,
+        config: configObject,
+      },
+    };
+    const response = await fetch(`/api/config/widgets/${encodeURIComponent(widgetId)}`, {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.detail || 'Failed to save widget');
+    }
+    if (applyAfterSave) {
+      await applyConfig(true);
+    }
+    await loadConfigEditors();
+    await refreshDashboard();
+    setEditorStatus(widgetEditorStatus, applyAfterSave ? 'Widget saved and applied.' : 'Widget saved.');
+  } catch (error) {
+    setEditorStatus(widgetEditorStatus, error.message || String(error), true);
+  }
+}
+
+function renderProviderEditor() {
+  const family = providerEditorSelect.value;
+  const provider = latestConfig?.providers?.[family] || {};
+  providerEnabledInput.checked = Boolean(provider.enabled ?? true);
+  providerPrimaryInput.value = provider.primary || '';
+  providerFallbackInput.value = provider.fallback || '';
+  providerNameInput.value = provider.provider || '';
+  providerApiKeyEnvInput.value = provider.api_key_env || '';
+  providerRefreshInput.value = String(provider.refresh_seconds ?? '');
+  providerStaleInput.value = String(provider.stale_after_seconds ?? '');
+  providerSymbolsInput.value = (provider.symbols || []).join(', ');
+  providerLabelsJsonInput.value = toPrettyJson(provider.labels || {});
+  providerAliasesJsonInput.value = toPrettyJson(provider.aliases || {});
+  providerConfigJsonInput.value = toPrettyJson(provider.config || {});
+}
+
+async function saveProvider(applyAfterSave) {
+  const family = providerEditorSelect.value;
+  try {
+    const labels = parseJsonOrThrow(providerLabelsJsonInput.value, 'provider labels JSON');
+    const aliases = parseJsonOrThrow(providerAliasesJsonInput.value, 'provider aliases JSON');
+    const config = parseJsonOrThrow(providerConfigJsonInput.value, 'provider config JSON');
+    const payload = {
+      provider: {
+        enabled: providerEnabledInput.checked,
+        provider: providerNameInput.value || null,
+        primary: providerPrimaryInput.value || null,
+        fallback: providerFallbackInput.value || null,
+        refresh_seconds: providerRefreshInput.value ? Number(providerRefreshInput.value) : null,
+        stale_after_seconds: providerStaleInput.value ? Number(providerStaleInput.value) : null,
+        symbols: parseCommaList(providerSymbolsInput.value),
+        labels,
+        aliases,
+        api_key_env: providerApiKeyEnvInput.value || null,
+        config,
+      },
+    };
+    const response = await fetch(`/api/config/providers/${encodeURIComponent(family)}`, {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.detail || 'Failed to save provider');
+    }
+    if (applyAfterSave) {
+      await applyConfig(true);
+    }
+    await loadConfigEditors();
+    await refreshDashboard();
+    setEditorStatus(providerEditorStatus, applyAfterSave ? 'Provider saved and applied.' : 'Provider saved.');
+  } catch (error) {
+    setEditorStatus(providerEditorStatus, error.message || String(error), true);
+  }
+}
+
+function renderPageEditorOptions() {
+  const pages = latestConfig?.pages || [];
+  const previous = pageEditorSelect.value;
+  pageEditorSelect.innerHTML = '';
+  for (const page of pages) {
+    const option = document.createElement('option');
+    option.value = page.page_id;
+    option.textContent = `${page.page_id} - ${page.name}`;
+    pageEditorSelect.appendChild(option);
+  }
+  pageOrderInput.value = pages.map((page) => page.page_id).join(', ');
+  if (pages.length === 0) {
+    return;
+  }
+  const selected = pages.find((page) => page.page_id === previous) ? previous : pages[0].page_id;
+  pageEditorSelect.value = selected;
+  renderSelectedPage();
+}
+
+function renderSelectedPage() {
+  const pageId = pageEditorSelect.value;
+  const page = (latestConfig?.pages || []).find((entry) => entry.page_id === pageId);
+  if (!page) {
+    return;
+  }
+  pageIdInput.value = page.page_id || '';
+  pageNameInput.value = page.name || '';
+  pageLayoutInput.value = page.layout || '';
+  pageDurationInput.value = String(page.duration_seconds ?? 8);
+  pageWidgetsInput.value = (page.widgets || []).join(', ');
+  pageTickerWidgetInput.value = page.ticker_widget || '';
+}
+
+function clearPageEditor() {
+  pageIdInput.value = '';
+  pageNameInput.value = '';
+  pageLayoutInput.value = 'single_kpi';
+  pageDurationInput.value = '8';
+  pageWidgetsInput.value = '';
+  pageTickerWidgetInput.value = '';
+}
+
+async function savePage(applyAfterSave) {
+  const pageId = pageIdInput.value.trim();
+  if (!pageId) {
+    setEditorStatus(pageEditorStatus, 'Page ID is required.', true);
+    return;
+  }
+  try {
+    const payload = {
+      page: {
+        page_id: pageId,
+        name: pageNameInput.value.trim() || pageId,
+        layout: pageLayoutInput.value.trim() || 'single_kpi',
+        widgets: parseCommaList(pageWidgetsInput.value),
+        duration_seconds: Number(pageDurationInput.value || 8),
+        pinned: false,
+        ticker_widget: pageTickerWidgetInput.value.trim() || null,
+      },
+    };
+    const response = await fetch('/api/config/pages', {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.detail || 'Failed to save page');
+    }
+    if (applyAfterSave) {
+      await applyConfig(true);
+    }
+    await loadConfigEditors();
+    await refreshDashboard();
+    setEditorStatus(pageEditorStatus, applyAfterSave ? 'Page saved and applied.' : 'Page saved.');
+  } catch (error) {
+    setEditorStatus(pageEditorStatus, error.message || String(error), true);
+  }
+}
+
+async function deleteSelectedPage() {
+  const pageId = pageEditorSelect.value;
+  if (!pageId) {
+    return;
+  }
+  try {
+    const response = await fetch(`/api/config/pages/${encodeURIComponent(pageId)}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.detail || 'Failed to delete page');
+    }
+    await applyConfig(true);
+    await loadConfigEditors();
+    await refreshDashboard();
+    setEditorStatus(pageEditorStatus, 'Page deleted and applied.');
+  } catch (error) {
+    setEditorStatus(pageEditorStatus, error.message || String(error), true);
+  }
+}
+
+async function reorderPagesAndApply() {
+  try {
+    const ids = parseCommaList(pageOrderInput.value);
+    const response = await fetch('/api/config/pages/reorder', {
+      method: 'POST',
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({page_ids: ids}),
+    });
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}));
+      throw new Error(body.detail || 'Failed to reorder pages');
+    }
+    await applyConfig(true);
+    await loadConfigEditors();
+    await refreshDashboard();
+    setEditorStatus(pageEditorStatus, 'Page order updated and applied.');
+  } catch (error) {
+    setEditorStatus(pageEditorStatus, error.message || String(error), true);
+  }
+}
+
 function toneForFreshness(freshness) {
   if (freshness === 'fresh') return 'ok';
   if (freshness === 'stale') return 'warn';
@@ -130,20 +596,34 @@ function toneForHealth(health) {
 function renderWidgetHealth(widgetPayload) {
   const statusMap = widgetPayload.status || {};
   const dataMap = widgetPayload.data || {};
-  const widgetIds = Object.keys(statusMap).sort();
+  const metaMap = widgetPayload.meta || {};
+  const widgetIds = Object.keys(metaMap).sort();
   widgetHealthBody.innerHTML = '';
   for (const widgetId of widgetIds) {
     const status = statusMap[widgetId] || {};
     const data = dataMap[widgetId] || {};
+    const meta = metaMap[widgetId] || {};
     const freshness = status.last_freshness || data.freshness || 'unknown';
     const health = status.health_state || data.health_state || 'unknown';
     const sourceLabel = status.source_label || data.source_label || 'unknown';
     const fallback = status.fallback_active ? 'yes' : 'no';
     const details = status.last_error_message || status.status_summary || data.status_summary || '-';
+    const assignedPages = Array.isArray(meta.assigned_to_pages) && meta.assigned_to_pages.length
+      ? meta.assigned_to_pages.join(', ')
+      : 'none';
+    const activeTone = meta.active ? 'ok' : 'warn';
+    const activeLabel = meta.active ? 'yes' : 'no';
+    const visibleTone = meta.currently_visible ? 'ok' : 'warn';
+    const visibleLabel = meta.currently_visible ? 'yes' : 'no';
+    const runMode = meta.run_mode || 'background_always';
 
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${widgetId}</td>
+      <td>${statusBadge(activeLabel, activeTone)}</td>
+      <td>${runMode}</td>
+      <td>${assignedPages}</td>
+      <td>${statusBadge(visibleLabel, visibleTone)}</td>
       <td>${statusBadge(health, toneForHealth(health))}</td>
       <td>${statusBadge(freshness, toneForFreshness(freshness))}</td>
       <td>${sourceLabel}</td>
@@ -243,7 +723,24 @@ brightnessForm.addEventListener('submit', async (event) => {
   }
 });
 
-refreshDashboard();
+widgetEditorSelect.addEventListener('change', renderSelectedWidget);
+widgetSaveBtn.addEventListener('click', () => saveWidget(false));
+widgetSaveApplyBtn.addEventListener('click', () => saveWidget(true));
+
+providerEditorSelect.addEventListener('change', renderProviderEditor);
+providerSaveBtn.addEventListener('click', () => saveProvider(false));
+providerSaveApplyBtn.addEventListener('click', () => saveProvider(true));
+
+pageEditorSelect.addEventListener('change', renderSelectedPage);
+pageSaveBtn.addEventListener('click', () => savePage(false));
+pageSaveApplyBtn.addEventListener('click', () => savePage(true));
+pageDeleteBtn.addEventListener('click', deleteSelectedPage);
+pageNewBtn.addEventListener('click', clearPageEditor);
+pageReorderApplyBtn.addEventListener('click', reorderPagesAndApply);
+
+Promise.all([loadConfigEditors(), refreshDashboard()]).catch((error) => {
+  console.error(error);
+});
 setInterval(refreshDashboard, REFRESH_MS);
 </script>
 </body>

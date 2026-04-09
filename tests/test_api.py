@@ -45,6 +45,7 @@ def test_api_status_and_preview() -> None:
         widgets_payload = widgets.json()
         assert "data" in widgets_payload
         assert "status" in widgets_payload
+        assert "meta" in widgets_payload
 
         preview = client.get("/api/preview")
         assert preview.status_code == 200
@@ -114,6 +115,7 @@ def test_api_widgets_status_shape() -> None:
         widgets = client.get("/api/widgets")
         assert widgets.status_code == 200
         status_payload = widgets.json()["status"]["clock"]
+        meta_payload = widgets.json()["meta"]["clock"]
         assert {
             "widget_id",
             "health_state",
@@ -124,6 +126,13 @@ def test_api_widgets_status_shape() -> None:
             "fallback_active",
             "status_summary",
         }.issubset(status_payload.keys())
+        assert {
+            "enabled",
+            "run_mode",
+            "assigned_to_pages",
+            "currently_visible",
+            "active",
+        }.issubset(meta_payload.keys())
 
 
 def test_cli_accepts_config_after_subcommand(tmp_path, monkeypatch) -> None:

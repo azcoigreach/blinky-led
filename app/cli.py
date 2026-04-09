@@ -83,7 +83,7 @@ def serve_dashboard(
     """Run FastAPI web server and dashboard runtime."""
     initialize_context(ctx, config_path, env_file, log_level)
     runtime = DashboardRuntime(ctx.obj["config"])
-    app = create_web_app(runtime)
+    app = create_web_app(runtime, config_path=ctx.obj["config_path"])
     bind_host = host or ctx.obj["config"].api.host
     bind_port = port or ctx.obj["config"].api.port
     uvicorn.run(app, host=bind_host, port=bind_port)

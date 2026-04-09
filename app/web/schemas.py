@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.core.config import DashboardConfig, ScheduleConfig
+from app.core.config import DashboardConfig, PageConfig, ProviderFamilyConfig, ScheduleConfig, WidgetConfig
 from app.core.models import PageDefinition, RenderFrame, WidgetData, WidgetStatus
 
 
@@ -35,6 +35,30 @@ class PinPageRequest(ApiRequestModel):
     )
 
 
+class WidgetUpsertRequest(ApiRequestModel):
+    widget: WidgetConfig
+
+
+class ProviderUpsertRequest(ApiRequestModel):
+    provider: ProviderFamilyConfig
+
+
+class PageUpsertRequest(ApiRequestModel):
+    page: PageConfig
+
+
+class PageReorderRequest(ApiRequestModel):
+    page_ids: list[str] = Field(default_factory=list)
+
+
+class ConfigValidateRequest(ApiRequestModel):
+    config: dict
+
+
+class ConfigApplyRequest(ApiRequestModel):
+    reload_runtime: bool = True
+
+
 class OverrideResponse(BaseModel):
     ok: bool = True
     message: str | None = None
@@ -55,6 +79,16 @@ class ReloadResponse(BaseModel):
     message: str = "runtime reloaded"
 
 
+class ConfigMutationResponse(BaseModel):
+    ok: bool = True
+    message: str
+
+
+class ConfigValidateResponse(BaseModel):
+    ok: bool
+    message: str
+
+
 class StatusResponse(BaseModel):
     running: bool
     mode: str
@@ -68,9 +102,18 @@ class StatusResponse(BaseModel):
     last_frame: RenderFrame
 
 
+class WidgetRuntimeMeta(BaseModel):
+    enabled: bool
+    run_mode: str
+    assigned_to_pages: list[str] = Field(default_factory=list)
+    currently_visible: bool = False
+    active: bool = False
+
+
 class WidgetsResponse(BaseModel):
     data: dict[str, WidgetData] = Field(default_factory=dict)
     status: dict[str, WidgetStatus] = Field(default_factory=dict)
+    meta: dict[str, WidgetRuntimeMeta] = Field(default_factory=dict)
 
 
 class PagesResponse(BaseModel):

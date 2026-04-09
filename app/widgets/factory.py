@@ -31,8 +31,11 @@ WIDGET_TYPES: dict[str, type[Widget]] = {
 
 def build_widgets(config: DashboardConfig) -> dict[str, Widget]:
     widgets: dict[str, Widget] = {}
+    assigned_widget_ids = {widget_id for page in config.pages for widget_id in page.widgets}
     for name, widget_cfg in config.widgets.items():
         if not widget_cfg.enabled:
+            continue
+        if widget_cfg.run_mode == "page_bound" and name not in assigned_widget_ids:
             continue
         widget_cls = WIDGET_TYPES.get(name)
         if not widget_cls:

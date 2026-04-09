@@ -37,6 +37,34 @@ class DashboardRuntime:
         self._running = False
         self._last_frame = RenderFrame(width=config.panel.width, height=config.panel.height, page_id=self.pages[0].page_id)
 
+    def _rebuild_components(self, config: DashboardConfig, *, previous_state: AppState | None = None) -> None:
+        self.config = config
+        next_state = AppState(mode=config.renderer.mode)
+        if previous_state is not None:
+            next_state.override_message = previous_state.override_message
+            next_state.brightness = previous_state.brightness
+            page_ids = {page.page_id for page in build_pages(config)}
+            if previous_state.pinned_page_id in page_ids:
+                next_state.pinned_page_id = previous_state.pinned_page_id
+        self.state = next_state
+        self.widgets = build_widgets(config)
+        self.pages = build_pages(config)
+        self.rotation = RotationController(self.pages)
+        self.layout = LayoutEngine(config.panel.width, config.panel.height)
+        self.cache = TTLCache()
+        self.scheduler = WidgetScheduler(self.widgets, self.cache, self.state.widget_status)
+        self.renderer = self._build_renderer()
+        self._last_frame = RenderFrame(width=config.panel.width, height=config.panel.height, page_id=self.pages[0].page_id)
+
+    async def apply_config(self, config: DashboardConfig) -> None:
+        was_running = self.state.running
+        previous_state = self.state.model_copy(deep=True)
+        if was_running:
+            await self.stop()
+        self._rebuild_components(config, previous_state=previous_state)
+        if was_running:
+            await self.start()
+
     def _schedule_brightness(self) -> int:
         now_hour = datetime.now().hour
         schedule = self.config.schedule
@@ -107,6 +135,32 @@ class DashboardRuntime:
         out = BytesIO()
         image.resize((self.config.panel.width * 4, self.config.panel.height * 4), Image.NEAREST).save(out, format="PNG")
         return out.getvalue()
+
+    def widget_runtime_meta(self) -> dict[str, dict[str, object]]:
+        assigned_to_pages: dict[str, list[str]] = {widget_id: [] for widget_id in self.config.widgets}
+        for page in self.pages:
+            for widget_id in page.widgets:
+                assigned_to_pages.setdefault(widget_id, []).append(page.page_id)
+
+        visible_widget_ids: set[str] = set()
+        current_page_id = self.state.current_page_id
+        if current_page_id:
+            for page in self.pages:
+                if page.page_id == current_page_id:
+                    visible_widget_ids = set(page.widgets)
+                    break
+
+        meta: dict[str, dict[str, object]] = {}
+        for widget_id, widget_cfg in self.config.widgets.items():
+            assigned_pages = assigned_to_pages.get(widget_id, [])
+            meta[widget_id] = {
+                "enabled": widget_cfg.enabled,
+                "run_mode": widget_cfg.run_mode,
+                "assigned_to_pages": assigned_pages,
+                "currently_visible": widget_id in visible_widget_ids,
+                "active": widget_id in self.widgets,
+            }
+        return meta
 
     def status(self) -> dict:
         page_by_id = {page.page_id: page.name for page in self.pages}

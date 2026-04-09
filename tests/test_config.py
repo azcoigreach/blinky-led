@@ -89,3 +89,54 @@ pages:
     assert conf.providers.stocks.primary == "finnhub"
     assert conf.providers.stocks.fallback == "alphavantage"
     assert conf.providers.stocks.symbols == ["AAPL", "SPY"]
+
+
+def test_widget_run_mode_defaults_to_background_always(tmp_path: Path) -> None:
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(
+        """
+renderer:
+  mode: simulator
+widgets:
+  clock:
+    enabled: true
+    refresh_seconds: 1
+    ttl_seconds: 2
+    retries: 1
+    config: {}
+pages:
+  - page_id: p1
+    name: P1
+    layout: single_kpi
+    widgets: [clock]
+""".strip(),
+        encoding="utf-8",
+    )
+    conf = load_config(cfg)
+    assert conf.widgets["clock"].run_mode == "background_always"
+
+
+def test_widget_run_mode_explicit_page_bound(tmp_path: Path) -> None:
+    cfg = tmp_path / "config.yaml"
+    cfg.write_text(
+        """
+renderer:
+  mode: simulator
+widgets:
+  clock:
+    enabled: true
+    run_mode: page_bound
+    refresh_seconds: 1
+    ttl_seconds: 2
+    retries: 1
+    config: {}
+pages:
+  - page_id: p1
+    name: P1
+    layout: single_kpi
+    widgets: [clock]
+""".strip(),
+        encoding="utf-8",
+    )
+    conf = load_config(cfg)
+    assert conf.widgets["clock"].run_mode == "page_bound"

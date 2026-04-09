@@ -66,6 +66,20 @@ input, button {
   padding: 8px;
 }
 
+textarea {
+  width: 100%;
+  margin: 4px 0 10px;
+  border-radius: 6px;
+  border: 1px solid #2f465d;
+  background: #0f171f;
+  color: var(--ink);
+  padding: 8px;
+  resize: vertical;
+  min-height: 84px;
+  font-family: "IBM Plex Mono", "Consolas", monospace;
+  font-size: 0.85rem;
+}
+
 button {
   background: linear-gradient(90deg, #23779a, var(--accent));
   border: none;
@@ -100,10 +114,25 @@ select {
   font-size: 0.85rem;
 }
 
+.error-text {
+  color: var(--error);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.form-grid label {
+  align-self: center;
+}
+
 #widget-health-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
+  table-layout: fixed;
 }
 
 #widget-health-table th,
@@ -112,6 +141,7 @@ select {
   padding: 6px;
   text-align: left;
   vertical-align: top;
+  word-break: break-word;
 }
 
 .badge {
